@@ -24,10 +24,11 @@
     <name>GitLab Branch Source Plugin</name>
     <url>https://github.com/Argelbargel/gitlab-branch-source-plugin</url>
     <description>Multibranch projects and organization folders from GitLab</description>
+
     <licenses>
         <license>
-            <name>MIT</name>
-            <url>http://opensource.org/licenses/MIT</url>
+            <name>GPL v2.0 License</name>
+            <url>http://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html</url>
         </license>
     </licenses>
 
