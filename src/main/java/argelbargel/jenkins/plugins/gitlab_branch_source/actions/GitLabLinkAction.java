@@ -53,9 +53,8 @@ public final class GitLabLinkAction implements Action, IconSpec {
     }
 
     @Nonnull
-    public static GitLabLinkAction toMergeRequest(GitlabProject project, String id) {
-        return create(Messages.GitLabLink_DisplayName_MergeRequest(), ICON_MERGE_REQUEST, project,
-                "merge_requests/" + String.valueOf(id));
+    public static GitLabLinkAction toMergeRequest(String url) {
+        return create(Messages.GitLabLink_DisplayName_MergeRequest(), ICON_MERGE_REQUEST, url);
     }
 
     @Nonnull

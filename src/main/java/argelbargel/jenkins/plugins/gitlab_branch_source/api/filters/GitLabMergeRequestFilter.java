@@ -43,7 +43,7 @@ public abstract class GitLabMergeRequestFilter {
             if (accepts(mr)) {
                 result.add(mr);
             } else {
-                listener.getLogger().format(Messages.GitLabMergeRequestFilter_rejecting(mr.getId(), reason())  + "\n");
+                listener.getLogger().format(Messages.GitLabMergeRequestFilter_rejecting(mr.getIid(), reason()) + "\n");
             }
         }
 

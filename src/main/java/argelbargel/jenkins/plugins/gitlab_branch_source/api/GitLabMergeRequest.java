@@ -10,6 +10,8 @@ public class GitLabMergeRequest extends GitlabMergeRequest {
     private boolean removeSourceBranch;
     @JsonProperty("work_in_progress")
     private boolean wip;
+    @JsonProperty("web_url")
+    private String url;
 
     public void setSha(String sha) {
         this.sha = sha;
@@ -33,5 +35,13 @@ public class GitLabMergeRequest extends GitlabMergeRequest {
 
     public boolean getRemoveSourceBranch() {
         return removeSourceBranch;
+    }
+
+    public void setWebUrl(String url) {
+        this.url = url;
+    }
+
+    public String getWebUrl() {
+        return url;
     }
 }

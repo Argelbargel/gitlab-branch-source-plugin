@@ -74,9 +74,8 @@ class SourceActions {
         Action linkAction;
 
         if (head instanceof ChangeRequestSCMHead) {
-            linkAction = GitLabLinkAction.toMergeRequest(source.getProject(), ((ChangeRequestSCMHead) head).getId());
-
             GitLabMergeRequest mr = retrieveMergeRequest((ChangeRequestSCMHead) head, listener);
+            linkAction = GitLabLinkAction.toMergeRequest(mr.getWebUrl());
             if (acceptMergeRequest(head)) {
                 boolean removeSourceBranch = mr.getRemoveSourceBranch() || removeSourceBranch(head);
                 actions.add(new GitLabSCMAcceptMergeRequestAction(mr.getProjectId(), mr.getId(), source.getMergeCommitMessage(), removeSourceBranch));

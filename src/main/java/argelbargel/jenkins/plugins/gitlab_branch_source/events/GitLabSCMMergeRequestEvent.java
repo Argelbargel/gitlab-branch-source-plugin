@@ -71,7 +71,7 @@ public final class GitLabSCMMergeRequestEvent extends GitLabSCMHeadEvent<MergeRe
         String sourceBranch = attributes.getSourceBranch();
         String hash = attributes.getLastCommit().getId();
         GitLabSCMMergeRequestHead head = createMergeRequest(
-                attributes.getId(), attributes.getTitle(),
+                attributes.getId(), attributes.getTitle(), attributes.getIid(),
                 createBranch(sourceProjectId, sourceBranch, hash),
                 createBranch(attributes.getTargetProjectId(), attributes.getTargetBranch(), REVISION_HEAD));
 

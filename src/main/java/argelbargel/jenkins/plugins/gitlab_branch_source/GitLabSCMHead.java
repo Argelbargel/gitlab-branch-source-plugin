@@ -20,12 +20,12 @@ public abstract class GitLabSCMHead extends SCMHead implements SCMHeadMixin {
         return new GitLabSCMTagHead(projectId, name, hash, timestamp);
     }
 
-    public static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, GitLabSCMHead source, GitLabSCMBranchHead target) {
-        return new GitLabSCMMergeRequestHead(id, name, source, target, false);
+    public static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, int iid, GitLabSCMHead source, GitLabSCMBranchHead target) {
+        return createMergeRequest(id, name, iid, source, target, false);
     }
 
-    static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
-        return new GitLabSCMMergeRequestHead(id, name, source, target, mergeable);
+    static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, int iid, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
+        return new GitLabSCMMergeRequestHead(id, name + " (!" + iid + ")", source, target, mergeable);
     }
 
     static GitLabSCMBranchHead createBranch(int projectId, String name, String hash, boolean hasMergeRequest) {

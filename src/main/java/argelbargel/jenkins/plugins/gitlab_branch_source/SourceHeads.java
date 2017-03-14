@@ -225,14 +225,15 @@ class SourceHeads {
     }
 
     private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitLabMergeRequest mergeRequest, @Nonnull TaskListener listener) throws IOException, InterruptedException {
-        log(listener, Messages.GitLabSCMSource_monitoringMergeRequest(mergeRequest.getId()));
+        log(listener, Messages.GitLabSCMSource_monitoringMergeRequest(mergeRequest.getIid()));
 
         String targetBranch = mergeRequest.getTargetBranch();
         GitLabSCMMergeRequestHead head = createMergeRequest(
-                mergeRequest.getId(), mergeRequest.getTitle(),
+                mergeRequest.getId(),
+                mergeRequest.getTitle(),
+                mergeRequest.getIid(),
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
-                createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)),
-                Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
+                createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)), Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
 
         if (source.buildUnmerged(head)) {
             observe(criteria, observer, head, listener);
@@ -240,7 +241,7 @@ class SourceHeads {
 
         if (source.buildMerged(head)) {
             if (!head.isMergeable() && buildOnlyMergeableRequests(head)) {
-                log(listener, Messages.GitLabSCMSource_willNotBuildUnmergeableRequest(mergeRequest.getId(), mergeRequest.getTargetBranch(), mergeRequest.getMergeStatus()));
+                log(listener, Messages.GitLabSCMSource_willNotBuildUnmergeableRequest(mergeRequest.getIid(), mergeRequest.getTargetBranch(), mergeRequest.getMergeStatus()));
             }
             observe(criteria, observer, head.merged(), listener);
         }
