@@ -286,7 +286,7 @@ class SourceHeads {
     }
 
     private Map<Integer, String> branchesWithMergeRequests(TaskListener listener) throws IOException, InterruptedException {
-        if (source.getBuildBranchesWithMergeRequests()) {
+        if (!source.getProject().isMergeRequestsEnabled() || source.getBuildBranchesWithMergeRequests()) {
             return emptyMap();
         }
 
