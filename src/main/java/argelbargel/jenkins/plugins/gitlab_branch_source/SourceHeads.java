@@ -159,7 +159,11 @@ class SourceHeads {
 
     private void retrieveAll(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         // TODO: could/should we optimize based on SCMHeadObserver#getIncludes()?
-        retrieveMergeRequests(criteria, observer, listener);
+
+        if (source.getProject().isMergeRequestsEnabled()) {
+            retrieveMergeRequests(criteria, observer, listener);
+        }
+        
         retrieveBranches(criteria, observer, listener);
         retrieveTags(criteria, observer, listener);
     }
