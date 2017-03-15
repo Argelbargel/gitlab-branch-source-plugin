@@ -145,22 +145,20 @@ public final class GitLabAPI {
 
     public List<GitLabProject> findProjects(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
         LOGGER.fine("finding projects for group" + group + ", " + selector + ", " + visibility + ", " + searchPattern + "...");
-        try {
-            return delegate
-                    .retrieve()
-                    .getAll(projectUrl(group, selector, visibility, searchPattern), GitLabProject[].class);
-        } catch (Exception e) {
-            throw new GitLabAPIException(e);
-        }
+        return findProjects(projectUrl(group, selector, visibility, searchPattern));
     }
 
 
     public List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
         LOGGER.fine("finding projects for " + selector + ", " + visibility + ", " + searchPattern + "...");
+        return findProjects(projectUrl(selector, visibility, searchPattern));
+    }
+
+    private List<GitLabProject> findProjects(String url) throws GitLabAPIException {
         try {
             return delegate
                     .retrieve()
-                    .getAll(projectUrl(selector, visibility, searchPattern), GitLabProject[].class);
+                    .getAll(url, GitLabProject[].class);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
