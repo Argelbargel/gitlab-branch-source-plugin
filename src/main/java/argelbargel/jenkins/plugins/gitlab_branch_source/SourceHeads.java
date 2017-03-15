@@ -159,11 +159,7 @@ class SourceHeads {
 
     private void retrieveAll(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         // TODO: could/should we optimize based on SCMHeadObserver#getIncludes()?
-
-        if (source.getProject().isMergeRequestsEnabled()) {
-            retrieveMergeRequests(criteria, observer, listener);
-        }
-        
+        retrieveMergeRequests(criteria, observer, listener);
         retrieveBranches(criteria, observer, listener);
         retrieveTags(criteria, observer, listener);
     }
@@ -171,7 +167,7 @@ class SourceHeads {
     private void retrieveMergeRequests(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         branchesWithMergeRequestsCache = new HashMap<>();
 
-        if (source.getMonitorAndBuildMergeRequestsFromOrigin() || source.getMonitorAndBuildMergeRequestsFromForks()) {
+        if (source.getProject().isMergeRequestsEnabled() && (source.getMonitorAndBuildMergeRequestsFromOrigin() || source.getMonitorAndBuildMergeRequestsFromForks())) {
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequests());
 
             GitLabMergeRequestFilter filter = source.createMergeRequestFilter(listener);
@@ -286,7 +282,7 @@ class SourceHeads {
     }
 
     private Map<Integer, String> branchesWithMergeRequests(TaskListener listener) throws IOException, InterruptedException {
-        if (!source.getProject().isMergeRequestsEnabled() || source.getBuildBranchesWithMergeRequests()) {
+        if (source.getBuildBranchesWithMergeRequests()) {
             return emptyMap();
         }
 
