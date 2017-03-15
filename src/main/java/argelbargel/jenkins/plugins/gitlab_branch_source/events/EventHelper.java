@@ -18,7 +18,7 @@ class EventHelper {
     private static final Logger LOGGER = Logger.getLogger(EventHelper.class.getName());
 
     static GitlabProject getMatchingProject(GitLabSCMNavigator navigator, SystemHook hook) {
-        return getMatchingProject(navigator,hook.getProjectVisibility(), hook.getPathWithNamespace(), hook.getProjectId());
+        return getMatchingProject(navigator, hook.getProjectVisibility(), hook.getPathWithNamespace(), hook.getProjectId());
     }
 
     static GitlabProject getMatchingProject(GitLabSCMNavigator navigator, PushHook hook) {
