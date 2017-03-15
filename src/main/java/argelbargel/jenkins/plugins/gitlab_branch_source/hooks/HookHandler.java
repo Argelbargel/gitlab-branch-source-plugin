@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabHookEventType.PUSH;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabHookEventType.byHeader;
 import static jenkins.scm.api.SCMEvent.originOf;
 
@@ -58,11 +57,7 @@ class HookHandler {
         try {
             LOGGER.fine("handling system-hook for " + id);
             SystemHook hook = readHook(SystemHook.class, request);
-            if (hook.getEventName().equals("push")) {
-                handle(id, PUSH, request);
-            } else {
-                SCMSourceEvent.fireNow(GitLabSCMSourceEvent.create(id, hook, originOf(request)));
-            }
+            SCMSourceEvent.fireNow(GitLabSCMSourceEvent.create(id, hook, originOf(request)));
         } catch (IllegalArgumentException e) {
             LOGGER.warning("ignoring system hook: " + e.getMessage());
         }
