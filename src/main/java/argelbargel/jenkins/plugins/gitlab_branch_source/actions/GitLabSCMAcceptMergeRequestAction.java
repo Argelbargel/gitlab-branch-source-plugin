@@ -19,12 +19,14 @@ public final class GitLabSCMAcceptMergeRequestAction extends InvisibleAction imp
 
     private final int projectId;
     private final int mergeRequestId;
+    private final int mergeRequestScopedId;
     private final String commitMessage;
     private final boolean removeSourceBranch;
 
-    public GitLabSCMAcceptMergeRequestAction(int projectId, int mergeRequestId, String commitMessage, boolean removeSourceBranch) {
+    public GitLabSCMAcceptMergeRequestAction(int projectId, int mergeRequestId, int mergeRequestScopedId, String commitMessage, boolean removeSourceBranch) {
         this.projectId = projectId;
         this.mergeRequestId = mergeRequestId;
+        this.mergeRequestScopedId = mergeRequestScopedId;
         this.commitMessage = commitMessage;
         this.removeSourceBranch = removeSourceBranch;
     }
@@ -35,7 +37,7 @@ public final class GitLabSCMAcceptMergeRequestAction extends InvisibleAction imp
             listener.getLogger().format("cannot publish build-status pending as no gitlab-connection is configured!");
         } else {
             try {
-                client.acceptMergeRequest(projectId, mergeRequestId, MessageFormat.format(commitMessage, mergeRequestId, build.getFullDisplayName()), removeSourceBranch);
+                client.acceptMergeRequest(projectId, mergeRequestId, MessageFormat.format(commitMessage, mergeRequestScopedId, build.getFullDisplayName()), removeSourceBranch);
             } catch (Exception e) {
                 listener.getLogger().format("failed to accept merge-request: " + e.getMessage());
                 LOGGER.log(SEVERE, "failed to accept merge-request", e);
