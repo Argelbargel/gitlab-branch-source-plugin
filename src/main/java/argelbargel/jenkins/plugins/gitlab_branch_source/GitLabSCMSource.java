@@ -311,12 +311,6 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         return project.getDescription();
     }
 
-    @Override
-    public void afterSave() {
-        LOGGER.info("auto-registering system-hook for source " + getId() + "...");
-        GitLabSCMWebHook.get().addListener(this);
-    }
-
     @Nonnull
     @Override
     public SCM build(@Nonnull SCMHead head, @CheckForNull SCMRevision revision) {
