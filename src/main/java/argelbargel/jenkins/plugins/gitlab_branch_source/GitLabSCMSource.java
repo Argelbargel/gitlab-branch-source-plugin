@@ -62,7 +62,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
     private GitLabProject project;
 
     GitLabSCMSource(@Nonnull SourceSettings settings, GitLabProject project) {
-        super(project.getPathWithNamespace());
+        super(null);
         this.settings = settings;
         this.project = project;
         this.hookListener = GitLabSCMWebHook.createListener(this);

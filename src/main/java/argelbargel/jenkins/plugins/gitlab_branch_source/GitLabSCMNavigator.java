@@ -19,7 +19,6 @@ import jenkins.scm.api.SCMSourceCategory;
 import jenkins.scm.api.SCMSourceObserver;
 import jenkins.scm.api.SCMSourceOwner;
 import jenkins.scm.impl.UncategorizedSCMSourceCategory;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.jenkins.ui.icon.IconSpec;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -37,13 +36,12 @@ import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.defaultGitLabConnectionName;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabConnection;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabConnectionId;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMIcons.ICON_GITLAB;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMIcons.iconFilePathPattern;
 
 
 // TODO: extract common interface for GitLabSCMSource, GitLabSCMNavigator and SourceSettings
-@SuppressWarnings({"unused", "WeakerAccess" })
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class GitLabSCMNavigator extends SCMNavigator {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMNavigator.class.getName());
     private static final String DEFAULT_SEARCH_PATTERN = "";
@@ -406,7 +404,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
     @Nonnull
     @Override
     protected String id() {
-        return gitLabConnectionId(getConnectionName()) + "::" + DigestUtils.md5Hex(getProjectSelectorId() + getProjectVisibilityId() + getProjectSearchPattern());
+        return getConnectionName();
     }
 
     public GitLabSCMWebHookListener getHookListener() {
