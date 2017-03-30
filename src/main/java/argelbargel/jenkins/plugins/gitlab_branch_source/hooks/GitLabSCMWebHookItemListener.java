@@ -15,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.logging.Logger;
 
 
-@SuppressWarnings("unused")
 @Extension
 public final class GitLabSCMWebHookItemListener extends ItemListener {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMWebHookItemListener.class.getName());

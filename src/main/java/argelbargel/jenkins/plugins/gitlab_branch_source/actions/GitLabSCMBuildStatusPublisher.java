@@ -52,10 +52,9 @@ class GitLabSCMBuildStatusPublisher {
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    public void publish(Run<?, ?> build, String publisherName, int projectId, String ref, String hash, BuildState state, String description) {
-        executorService.execute(new Message(build, publisherName, projectId, ref, hash, state, description));
+    public void publish(Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
+        executorService.execute(new Message(run, projectId, hash, state, ref, context, description));
     }
-
 
     private void shutdown() throws InterruptedException {
         executorService.shutdown();
@@ -64,17 +63,17 @@ class GitLabSCMBuildStatusPublisher {
 
 
     private static final class Message implements Runnable {
-        private final Run<?, ?> build;
+        private final Run<?, ?> run;
         private final int projectId;
-        private final String ref;
         private final String hash;
         private final BuildState state;
+        private final String ref;
         private final String context;
         private final String description;
 
 
-        private Message(Run<?, ?> build, String context, int projectId, String ref, String hash, BuildState state, String description) {
-            this.build = build;
+        private Message(Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
+            this.run = run;
             this.projectId = projectId;
             this.ref = ref;
             this.hash = hash;
@@ -85,13 +84,12 @@ class GitLabSCMBuildStatusPublisher {
 
         @Override
         public void run() {
-            GitLabApi client = GitLabConnectionProperty.getClient(build);
+            GitLabApi client = GitLabConnectionProperty.getClient(run);
             if (client == null) {
                 LOGGER.log(WARNING, "cannot publish build-status pending as no gitlab-connection is configured!");
             } else {
                 try {
-                    client.changeBuildStatus(projectId, hash, state, ref, context,
-                            Jenkins.getInstance().getRootUrl() + build.getUrl() + build.getNumber(), description);
+                    client.changeBuildStatus(projectId, hash, state, ref, context, Jenkins.getInstance().getRootUrl() + run.getUrl() + run.getNumber(), description);
                 } catch (Exception e) {
                     LOGGER.log(SEVERE, "failed to set build-status of '" + context + "' for project " + projectId + " to " + state, e);
                 }

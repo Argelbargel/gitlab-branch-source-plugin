@@ -357,15 +357,6 @@ public class GitLabSCMNavigator extends SCMNavigator {
         return sourceSettings.getRegisterWebHooks();
     }
 
-    public String getPublisherName() {
-        return sourceSettings.getPublisherName();
-    }
-
-    @DataBoundSetter
-    public void setPublisherName(String name) {
-        sourceSettings.setPublisherName(name);
-    }
-
     @DataBoundSetter
     public void setPublishUnstableBuildsAsSuccess(boolean value) {
         sourceSettings.setPublishUnstableBuildsAsSuccess(value);

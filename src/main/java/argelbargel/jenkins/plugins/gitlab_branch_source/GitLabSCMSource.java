@@ -162,10 +162,6 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         return settings.getPublishUnstableBuildsAsSuccess();
     }
 
-    public String getPublisherName() {
-        return settings.getPublisherName();
-    }
-
     public boolean getAcceptMergeRequestsFromOrigin() {
         return settings.originMonitorStrategy().getAcceptMergeRequests();
     }

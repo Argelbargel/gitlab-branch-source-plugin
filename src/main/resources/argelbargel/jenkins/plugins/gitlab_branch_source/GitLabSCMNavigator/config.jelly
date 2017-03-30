@@ -146,9 +146,6 @@
                     <f:entry title="${%Update Build Descriptions}" field="updateBuildDescription">
                         <f:checkbox/>
                     </f:entry>
-                    <f:entry title="${%Publisher Name}" field="publisherName">
-                        <f:textbox/>
-                    </f:entry>
                     <f:entry title="${%Merge Commit Message}" field="mergeCommitMessage">
                         <f:textbox/>
                     </f:entry>

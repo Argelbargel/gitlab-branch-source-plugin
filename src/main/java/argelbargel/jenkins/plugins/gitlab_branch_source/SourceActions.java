@@ -67,8 +67,7 @@ class SourceActions {
         actions.add(new GitLabSCMPublishAction(
                 source.getUpdateBuildDescription(),
                 buildStatusPublishMode(head),
-                source.getPublishUnstableBuildsAsSuccess(),
-                source.getPublisherName()
+                source.getPublishUnstableBuildsAsSuccess()
         ));
 
         Action linkAction;
@@ -87,7 +86,6 @@ class SourceActions {
             }
         }
 
-        actions.add(new GitLabSCMHeadMetadataAction(head, linkAction.getUrlName()));
         actions.add(linkAction);
         return actions;
     }
@@ -108,14 +106,24 @@ class SourceActions {
 
         String hash = revision.getHash();
         Action linkAction = GitLabLinkAction.toCommit(source.getProject(), hash);
-        actions.add(new GitLabSCMHeadMetadataAction((GitLabSCMHead) revision.getHead(), linkAction.getUrlName(), hash));
         actions.add(linkAction);
+
+        SCMHead head = revision.getHead();
+        if (head instanceof GitLabSCMMergeRequestHead) {
+            actions.add(createHeadMetadataAction(head.getName(), ((GitLabSCMMergeRequestHead) head).getSource(), hash, linkAction.getUrlName()));
+        } else if (head instanceof GitLabSCMHead) {
+            actions.add(createHeadMetadataAction(head.getName(), (GitLabSCMHead) head, hash, linkAction.getUrlName()));
+        }
 
         if (event instanceof GitLabSCMEvent) {
             actions.add(new GitLabSCMCauseAction(((GitLabSCMEvent) event).getCause()));
         }
 
         return actions;
+    }
+
+    private Action createHeadMetadataAction(String name, GitLabSCMHead head, String hash, String url) {
+        return new GitLabSCMHeadMetadataAction(name, head.getProjectId(), head.getName(), hash, url);
     }
 
     private GitLabMergeRequest retrieveMergeRequest(@Nonnull ChangeRequestSCMHead head, @Nonnull TaskListener listener) throws GitLabAPIException {

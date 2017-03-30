@@ -6,7 +6,6 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.AllowMergeRe
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.FilterWorkInProgress;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeRequestFilter;
 import hudson.model.TaskListener;
-import jenkins.model.Jenkins;
 
 import javax.annotation.Nonnull;
 
@@ -32,7 +31,6 @@ class SourceSettings {
     private boolean buildBranchesWithMergeRequests;
     private boolean registerWebHooks;
     private boolean updateBuildDescription;
-    private String publisherName;
     private boolean publishUnstableBuildsAsSuccess;
     private String mergeCommitMessage;
 
@@ -49,7 +47,6 @@ class SourceSettings {
         this.tagMonitorStrategy = new MonitorStrategy(false, false, no);
         this.registerWebHooks = true;
         this.updateBuildDescription = true;
-        this.publisherName = Jenkins.getInstance().getDisplayName();
         this.publishUnstableBuildsAsSuccess = false;
         this.mergeCommitMessage = DEFAULT_MERGE_COMMIT_MESSAGE;
     }
@@ -117,14 +114,6 @@ class SourceSettings {
 
     boolean getUpdateBuildDescription() {
         return updateBuildDescription;
-    }
-
-    void setPublisherName(String publisherName) {
-        this.publisherName = publisherName;
-    }
-
-    String getPublisherName() {
-        return publisherName;
     }
 
     void setPublishUnstableBuildsAsSuccess(boolean publishUnstableBuildsAsSuccess) {

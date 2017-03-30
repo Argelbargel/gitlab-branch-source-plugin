@@ -2,6 +2,7 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.actions;
 
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode;
+import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState;
 import hudson.model.InvisibleAction;
 import hudson.model.Result;
@@ -42,13 +43,11 @@ import static java.util.logging.Level.SEVERE;
 public final class GitLabSCMPublishAction extends InvisibleAction implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMPublishAction.class.getName());
 
-    private final String publisherName;
     private final boolean markUnstableAsSuccess;
     private final boolean updateBuildDescription;
     private final BuildStatusPublishMode mode;
 
-    public GitLabSCMPublishAction(boolean updateBuildDescription, BuildStatusPublishMode mode, boolean markUnstableAsSuccess, String publisherName) {
-        this.publisherName = publisherName;
+    public GitLabSCMPublishAction(boolean updateBuildDescription, BuildStatusPublishMode mode, boolean markUnstableAsSuccess) {
         this.markUnstableAsSuccess = markUnstableAsSuccess;
         this.updateBuildDescription = updateBuildDescription;
         this.mode = mode;
@@ -68,8 +67,9 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
         if (build instanceof WorkflowRun && mode == stages) {
             attachGraphListener((WorkflowRun) build, new GitLabSCMGraphListener(build, metadata));
         } else if (mode == result) {
-            build.addAction(new RunningContextsAction(publisherName));
-            publishBuildStatus(build, metadata, publisherName, running, description);
+            String context = Messages.GitLabSCMPublishAction_DefaultContext(build.getNumber());
+            build.addAction(new RunningContextsAction(context));
+            publishBuildStatus(build, metadata, running, context, description);
         }
     }
 
@@ -103,15 +103,13 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
     private void updateRunningContexts(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata, BuildState state) {
         for (String context : build.getAction(RunningContextsAction.class).clear()) {
-            publishBuildStatus(build, metadata, context, state, "");
+            publishBuildStatus(build, metadata, state, context, "");
         }
     }
 
-    private void publishBuildStatus(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata, String context, BuildState state, String description) {
-        GitLabSCMBuildStatusPublisher.instance()
-                .publish(build, context, metadata.getProjectId(), metadata.getRef(), metadata.getHash(), state, description);
+    private void publishBuildStatus(Run<?, ?> run, GitLabSCMHeadMetadataAction metadata, BuildState state, String context, String description) {
+        GitLabSCMBuildStatusPublisher.instance().publish(run, metadata.getProjectId(), metadata.getHash(), state, metadata.getBranch(), context, description);
     }
-
 
     private final class GitLabSCMGraphListener implements GraphListener {
         private final Run<?, ?> build;
@@ -126,9 +124,9 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
         @Override
         public void onNewHead(FlowNode node) {
             if (isNamedStageStartNode(node)) {
-                publishBuildStatus(build, metadata, getRunningContexts().push(node), running, "");
+                publishBuildStatus(build, metadata, running, getRunningContexts().push(node), "");
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
-                publishBuildStatus(build, metadata, getRunningContexts().pop(), success, "");
+                publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
             }
         }
 

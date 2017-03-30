@@ -144,7 +144,7 @@ class SourceHeads {
         retrieveTag(criteria, observer, TAGS.remoteName(event.getPayload().getRef()), listener);
     }
 
-    private void retrieveTag(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, String tagName, @Nonnull TaskListener listener) throws GitLabAPIException {
+    private void retrieveTag(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, String tagName, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         if (!source.isExcluded(tagName)) {
             log(listener, Messages.GitLabSCMSource_retrievingTag(tagName));
             try {
@@ -195,7 +195,7 @@ class SourceHeads {
         }
     }
 
-    private void retrieveTags(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws GitLabAPIException, InterruptedException {
+    private void retrieveTags(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         if (source.getMonitorTags()) {
             log(listener, Messages.GitLabSCMSource_retrievingTags());
             for (GitlabTag tag : api().getTags(source.getProjectId())) {
@@ -219,7 +219,7 @@ class SourceHeads {
         observe(criteria, observer, createBranch(source.getProjectId(), branch.getName(), branch.getCommit().getId(), hasMergeRequest), listener);
     }
 
-    private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitlabTag tag, TaskListener listener) {
+    private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitlabTag tag, TaskListener listener) throws IOException, InterruptedException {
         log(listener, Messages.GitLabSCMSource_monitoringTag(tag.getName()));
         observe(criteria, observer, createTag(source.getProjectId(), tag.getName(), tag.getCommit().getId(), tag.getCommit().getCommittedDate().getTime()), listener);
     }
@@ -251,7 +251,7 @@ class SourceHeads {
         }
     }
 
-    private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitLabSCMHead head, TaskListener listener) {
+    private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitLabSCMHead head, TaskListener listener) throws IOException, InterruptedException {
         if (criteria == null || matches(criteria, head, listener)) {
             observer.observe(head, head.getRevision());
         }
