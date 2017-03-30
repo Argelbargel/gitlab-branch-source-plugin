@@ -89,7 +89,7 @@ class GitLabSCMBuildStatusPublisher {
                 LOGGER.log(WARNING, "cannot publish build-status pending as no gitlab-connection is configured!");
             } else {
                 try {
-                    client.changeBuildStatus(projectId, hash, state, ref, context, Jenkins.getInstance().getRootUrl() + run.getUrl() + run.getNumber(), description);
+                    client.changeBuildStatus(projectId, hash, state, ref, context, Jenkins.getInstance().getRootUrl() + run.getUrl(), description);
                 } catch (Exception e) {
                     LOGGER.log(SEVERE, "failed to set build-status of '" + context + "' for project " + projectId + " to " + state, e);
                 }
