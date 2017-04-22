@@ -246,7 +246,7 @@ class SourceHeads {
             observe(criteria, observer, head.merged(), listener);
         }
 
-        if (head.fromOrigin()) {
+        if (source.getBuildBranchesWithMergeRequests() && head.fromOrigin()) {
             branchesWithMergeRequests(listener).put(mergeRequest.getId(), mergeRequest.getSourceBranch());
         }
     }
