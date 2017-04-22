@@ -6,4 +6,5 @@ bin/
 target/
 work/
 *.iml
+*.patch
 /src/main/webapp
