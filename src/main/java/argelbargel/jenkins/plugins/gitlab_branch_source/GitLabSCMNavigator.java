@@ -394,7 +394,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
     @Override
     public void afterSave(@Nonnull SCMNavigatorOwner owner) {
         LOGGER.info("auto-registering system-hook for " + owner.getFullName() + "...");
-        GitLabSCMWebHook.get().addListener(this);
+        GitLabSCMWebHook.get().addListener(this, owner);
     }
 
     private SourceVisitor createVisitor(@Nonnull SCMSourceObserver observer) {

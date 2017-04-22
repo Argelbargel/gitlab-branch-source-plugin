@@ -2,9 +2,12 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.hooks;
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPI;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
+import hudson.model.Item;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabAPI;
@@ -18,26 +21,26 @@ class HookManager {
         managedListeners = new HashMap<>();
     }
 
-     synchronized void addListener(GitLabSCMWebHookListener listener, boolean register) {
-        addListener(listener);
+    synchronized void addListener(GitLabSCMWebHookListener listener, Item owner, boolean register) {
+        addListener(listener, owner);
         if (register) {
             registerHook(listener);
         }
     }
 
-    synchronized void removeListener(GitLabSCMWebHookListener listener, boolean unregister) {
-        removeListener(listener);
+    synchronized void removeListener(GitLabSCMWebHookListener listener, Item owner, boolean unregister) {
+        removeListener(listener, owner);
         if (unregister) {
             unregisterHook(listener);
         }
     }
 
-    private void addListener(GitLabSCMWebHookListener listener) {
+    private void addListener(GitLabSCMWebHookListener listener, Item owner) {
         if (!hasListener(listener.id())) {
             managedListeners.put(listener.id(), new ListenerState());
         }
 
-        managedListeners.get(listener.id()).acquire();
+        managedListeners.get(listener.id()).acquire(owner);
     }
 
     private void registerHook(GitLabSCMWebHookListener listener) {
@@ -61,10 +64,10 @@ class HookManager {
         }
     }
 
-    private void removeListener(GitLabSCMWebHookListener listener) {
+    private void removeListener(GitLabSCMWebHookListener listener, Item owner) {
         ListenerState managed = managedListeners.get(listener.id());
         if (managed != null) {
-            managed.release();
+            managed.release(owner);
             if (!managed.hasUsages()) {
                 unregisterAndDestroy(listener, managed);
             }
@@ -101,24 +104,24 @@ class HookManager {
 
 
     private static class ListenerState {
-        private int usages;
+        private Set<String> users;
         private boolean registered;
 
         ListenerState() {
-            usages = 0;
+            users = new HashSet<>();
             registered = false;
         }
 
-        void acquire() {
-            ++usages;
+        void acquire(Item owner) {
+            users.add(owner.getFullName());
         }
 
-        void release() {
-            --usages;
+        void release(Item owner) {
+            users.remove(owner.getFullName());
         }
 
         boolean hasUsages() {
-            return usages > 0;
+            return !users.isEmpty();
         }
 
         void register() {

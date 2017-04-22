@@ -41,7 +41,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         for (SCMSource source : item.getSCMSources()) {
             if (source instanceof GitLabSCMSource) {
                 LOGGER.info("adding hook-listener for source " + source.getId() + "...");
-                GitLabSCMWebHook.get().addListener((GitLabSCMSource) source);
+                GitLabSCMWebHook.get().addListener((GitLabSCMSource) source, item);
             }
         }
     }
@@ -50,7 +50,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         for (SCMNavigator navigator : owner.getSCMNavigators()) {
             if (navigator instanceof GitLabSCMNavigator) {
                 if (!StringUtils.isEmpty(((GitLabSCMNavigator) navigator).getConnectionName())) {
-                    GitLabSCMWebHook.get().removeListener((GitLabSCMNavigator) navigator);
+                    GitLabSCMWebHook.get().removeListener((GitLabSCMNavigator) navigator, owner);
                 }
             }
         }
@@ -60,7 +60,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         for (SCMSource source : owner.getSCMSources()) {
             if (source instanceof GitLabSCMSource) {
                 LOGGER.info("removing hook-listener for source " + source.getId() + "...");
-                GitLabSCMWebHook.get().removeListener((GitLabSCMSource) source);
+                GitLabSCMWebHook.get().removeListener((GitLabSCMSource) source, owner);
             }
         }
     }

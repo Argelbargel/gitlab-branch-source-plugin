@@ -4,6 +4,7 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.hooks;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMNavigator;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
 import hudson.Extension;
+import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.model.UnprotectedRootAction;
 import jenkins.model.Jenkins;
@@ -53,20 +54,20 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
          new Thread(new ListenerInitializerTask()).start();
     }
 
-    public void addListener(GitLabSCMNavigator navigator) {
-        manager.addListener(navigator.getHookListener(), navigator.getRegisterWebHooks());
+    public void addListener(GitLabSCMNavigator navigator, Item owner) {
+        manager.addListener(navigator.getHookListener(), owner, navigator.getRegisterWebHooks());
     }
 
-    public void addListener(GitLabSCMSource source) {
-        manager.addListener(source.getHookListener(), source.getRegisterWebHooks());
+    public void addListener(GitLabSCMSource source, Item owner) {
+        manager.addListener(source.getHookListener(), owner, source.getRegisterWebHooks());
     }
 
-    public void removeListener(GitLabSCMNavigator navigator) {
-        manager.removeListener(navigator.getHookListener(), navigator.getRegisterWebHooks());
+    public void removeListener(GitLabSCMNavigator navigator, Item owner) {
+        manager.removeListener(navigator.getHookListener(), owner, navigator.getRegisterWebHooks());
     }
 
-    public void removeListener(GitLabSCMSource source) {
-        manager.removeListener(source.getHookListener(), source.getRegisterWebHooks());
+    public void removeListener(GitLabSCMSource source, Item owner) {
+        manager.removeListener(source.getHookListener(), owner, source.getRegisterWebHooks());
     }
 
 
@@ -133,7 +134,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
                 for (SCMNavigator navigator : owner.getSCMNavigators()) {
                     if (navigator instanceof GitLabSCMNavigator) {
                         if (!StringUtils.isEmpty(((GitLabSCMNavigator) navigator).getConnectionName())) {
-                            addListener((GitLabSCMNavigator) navigator);
+                            addListener((GitLabSCMNavigator) navigator, owner);
                         }
                     }
                 }
@@ -142,7 +143,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
             for (SCMSourceOwner owner : Jenkins.getInstance().getAllItems(SCMSourceOwner.class)) {
                 for (SCMSource source : owner.getSCMSources()) {
                     if (source instanceof GitLabSCMSource) {
-                        addListener((GitLabSCMSource) source);
+                        addListener((GitLabSCMSource) source, owner);
                     }
                 }
             }
