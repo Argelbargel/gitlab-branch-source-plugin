@@ -42,15 +42,15 @@ This plugin is still under development. Thus you cannot install it via the Jenki
 [latest release](https://github.com/Argelbargel/gitlab-branch-source-plugin/releases) into the plugins directory of your
 Jenkins. I'm not sure if the dependencies get installed automatically. If that is not the case, make sure to install these
 dependencies:
-- [branch-api 2.0.7](https://wiki.jenkins-ci.org/display/JENKINS/Branch+API+Plugin)
-- [cloudbees-folder 5.18](https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Folders+Plugin)
-- [credentials 2.1.2](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
+- [branch-api 2.0.8](https://wiki.jenkins-ci.org/display/JENKINS/Branch+API+Plugin)
+- [cloudbees-folder 6.0.3](https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Folders+Plugin)
+- [credentials 2.1.13](https://wiki.jenkins-ci.org/display/JENKINS/Credentials+Plugin)
 - [git 3.0.5](https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin)
-- [git-client 2.2.1](https://wiki.jenkins-ci.org/display/JENKINS/Git+Client+Plugin)
+- [git-client 2.4.0](https://wiki.jenkins-ci.org/display/JENKINS/Git+Client+Plugin)
 - [gitlab-plugin 1.4.5](https://wiki.jenkins-ci.org/display/JENKINS/Gitlab+Plugin)
-- [scm-api 2.0.7](https://wiki.jenkins-ci.org/display/JENKINS/SCM+API+Plugin)
-- [workflow-api 2.11](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+API+Plugin) 
-- [workflow-cps 2.28](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Groovy+Plugin) 
+- [scm-api 2.1.1](https://wiki.jenkins-ci.org/display/JENKINS/SCM+API+Plugin)
+- [workflow-api 2.12](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+API+Plugin) 
+- [workflow-cps 2.29](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Groovy+Plugin) 
 - [workflow-job 2.10](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Job+Plugin) 
 - [workflow-multibranch 2.12](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Multibranch+Plugin) 
 
