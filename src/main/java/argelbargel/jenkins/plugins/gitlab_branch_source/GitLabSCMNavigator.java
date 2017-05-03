@@ -52,6 +52,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
     private String projectSelectorId;
     private String projectVisibilityId;
     private String projectGroup;
+    private boolean saved;
 
     @DataBoundConstructor
     public GitLabSCMNavigator(String connectionName) {
@@ -65,6 +66,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
         this.projectSelectorId = GitLabProjectSelector.VISIBLE.id();
         this.projectVisibilityId = GitLabProjectVisibility.ALL.id();
         this.projectGroup = null;
+        this.saved = false;
     }
 
     SourceSettings getSourceSettings() {
@@ -345,11 +347,18 @@ public class GitLabSCMNavigator extends SCMNavigator {
     }
 
     @DataBoundSetter
-    public void setRegisterWebHooks(boolean registerWebHooks) {
-        // invert value as GUI passes false if box is checked because of negative=true in optionalBlock
-        sourceSettings.setRegisterWebHooks(!registerWebHooks);
+    public void setListenToWebHooks(boolean value) {
+        sourceSettings.setListenToWebHooks(value);
     }
 
+    public boolean getListenToWebHooks() {
+        return sourceSettings.getListenToWebHooks();
+    }
+
+    @DataBoundSetter
+    public void setRegisterWebHooks(boolean registerWebHooks) {
+        sourceSettings.setRegisterWebHooks(registerWebHooks);
+    }
 
     public boolean getRegisterWebHooks() {
         return sourceSettings.getRegisterWebHooks();
@@ -393,8 +402,16 @@ public class GitLabSCMNavigator extends SCMNavigator {
 
     @Override
     public void afterSave(@Nonnull SCMNavigatorOwner owner) {
-        LOGGER.info("auto-registering system-hook for " + owner.getFullName() + "...");
-        GitLabSCMWebHook.get().addListener(this, owner);
+        if (getListenToWebHooks()) {
+            LOGGER.info("registering listener for " + owner.getFullName() + "...");
+            GitLabSCMWebHook.get().addListener(this, owner);
+            saved = true;
+        }
+    }
+
+    @Restricted(NoExternalUse.class)
+    public boolean saved() {
+        return saved;
     }
 
     private SourceVisitor createVisitor(@Nonnull SCMSourceObserver observer) {

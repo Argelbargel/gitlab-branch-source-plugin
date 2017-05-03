@@ -131,8 +131,12 @@
         <f:section title="Webhooks">
             <f:block>
                 <table style="width: 100%">
-                    <f:optionalBlock name="registerWebHooks" title="Auto-Register Web-Hooks" field="registerWebHooks" inline="true" negative="true">
-                        <f:entry title="${%Register this URL manually as system-hook}:">
+                    <f:optionalBlock name="listenToWebHooks" title="Listen To Web-Hooks" field="listenToWebHooks"
+                                     inline="true">
+                        <f:entry title="${%Auto-Register Web-Hooks}" field="registerWebHooks">
+                            <f:checkbox/>
+                        </f:entry>
+                        <f:entry title="${% Or register this URL manually as system-hook}:">
                             <f:readOnlyTextbox value="${instance.hookUrl}"/><br/>
                             (<strong>Push Events:</strong> false)
                         </f:entry>

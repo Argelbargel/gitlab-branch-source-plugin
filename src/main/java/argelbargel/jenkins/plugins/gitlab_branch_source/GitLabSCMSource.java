@@ -154,6 +154,10 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         return settings.getRegisterWebHooks();
     }
 
+    public boolean getListenToWebHooks() {
+        return settings.getListenToWebHooks();
+    }
+
     public boolean getUpdateBuildDescription() {
         return settings.getUpdateBuildDescription();
     }

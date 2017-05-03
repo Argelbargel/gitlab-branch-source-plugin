@@ -42,7 +42,7 @@ public final class GitLabSCMSourceEvent extends SCMSourceEvent<SystemHook> {
     }
 
     private boolean isMatch(@Nonnull GitLabSCMNavigator navigator) {
-        if (!navigator.getHookListener().id().equals(hookId)) {
+        if (!navigator.getListenToWebHooks() || !navigator.getHookListener().id().equals(hookId)) {
             return false;
         }
 
@@ -69,7 +69,7 @@ public final class GitLabSCMSourceEvent extends SCMSourceEvent<SystemHook> {
     }
 
     private boolean isMatch(@Nonnull GitLabSCMSource source) {
-        if (!source.getHookListener().id().startsWith(hookId) || source.getProjectId() != (getPayload().getProjectId())) {
+        if (!source.getListenToWebHooks() || !source.getHookListener().id().startsWith(hookId) || source.getProjectId() != (getPayload().getProjectId())) {
             return false;
         }
 

@@ -133,9 +133,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
             for (SCMNavigatorOwner owner : Jenkins.getInstance().getAllItems(SCMNavigatorOwner.class)) {
                 for (SCMNavigator navigator : owner.getSCMNavigators()) {
                     if (navigator instanceof GitLabSCMNavigator) {
-                        if (!StringUtils.isEmpty(((GitLabSCMNavigator) navigator).getConnectionName())) {
-                            addListener((GitLabSCMNavigator) navigator, owner);
-                        }
+                        handle((GitLabSCMNavigator) navigator, owner);
                     }
                 }
             }
@@ -143,9 +141,21 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
             for (SCMSourceOwner owner : Jenkins.getInstance().getAllItems(SCMSourceOwner.class)) {
                 for (SCMSource source : owner.getSCMSources()) {
                     if (source instanceof GitLabSCMSource) {
-                        addListener((GitLabSCMSource) source, owner);
+                        handle((GitLabSCMSource) source, owner);
                     }
                 }
+            }
+        }
+
+        private void handle(GitLabSCMSource source, SCMSourceOwner owner) {
+            if (source.getListenToWebHooks()) {
+                addListener(source, owner);
+            }
+        }
+
+        private void handle(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
+            if (navigator.getListenToWebHooks() && !StringUtils.isEmpty(navigator.getConnectionName())) {
+                addListener(navigator, owner);
             }
         }
     }

@@ -37,7 +37,7 @@ public abstract class GitLabSCMHeadEvent<T extends WebHook> extends SCMHeadEvent
     }
 
     protected boolean isMatch(@Nonnull GitLabSCMNavigator navigator) {
-        return hookId.equals(navigator.getHookListener().id());
+        return navigator.getListenToWebHooks() && hookId.equals(navigator.getHookListener().id());
     }
 
     @Override
@@ -46,7 +46,7 @@ public abstract class GitLabSCMHeadEvent<T extends WebHook> extends SCMHeadEvent
     }
 
     protected boolean isMatch(@Nonnull GitLabSCMSource source) {
-        return hookId.equals(source.getHookListener().id());
+        return source.getListenToWebHooks() && hookId.equals(source.getHookListener().id());
     }
 
     @Nonnull

@@ -12,17 +12,21 @@ import jenkins.scm.api.SCMSource;
 import jenkins.scm.api.SCMSourceOwner;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.logging.Logger;
-
 
 @Extension
 public final class GitLabSCMWebHookItemListener extends ItemListener {
-    private static final Logger LOGGER = Logger.getLogger(GitLabSCMWebHookItemListener.class.getName());
-
     @Override
     public void onCreated(Item item) {
         if (item instanceof SCMSourceOwner) {
             onCreated((SCMSourceOwner) item);
+        }
+    }
+
+    private void onCreated(SCMSourceOwner item) {
+        for (SCMSource source : item.getSCMSources()) {
+            if (source instanceof GitLabSCMSource) {
+                register((GitLabSCMSource) source, item);
+            }
         }
     }
 
@@ -37,21 +41,10 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         }
     }
 
-    private void onCreated(SCMSourceOwner item) {
-        for (SCMSource source : item.getSCMSources()) {
-            if (source instanceof GitLabSCMSource) {
-                LOGGER.info("adding hook-listener for source " + source.getId() + "...");
-                GitLabSCMWebHook.get().addListener((GitLabSCMSource) source, item);
-            }
-        }
-    }
-
     private void onDeleted(SCMNavigatorOwner owner) {
         for (SCMNavigator navigator : owner.getSCMNavigators()) {
             if (navigator instanceof GitLabSCMNavigator) {
-                if (!StringUtils.isEmpty(((GitLabSCMNavigator) navigator).getConnectionName())) {
-                    GitLabSCMWebHook.get().removeListener((GitLabSCMNavigator) navigator, owner);
-                }
+                unregister((GitLabSCMNavigator) navigator, owner);
             }
         }
     }
@@ -59,9 +52,55 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
     private void onDeleted(SCMSourceOwner owner) {
         for (SCMSource source : owner.getSCMSources()) {
             if (source instanceof GitLabSCMSource) {
-                LOGGER.info("removing hook-listener for source " + source.getId() + "...");
-                GitLabSCMWebHook.get().removeListener((GitLabSCMSource) source, owner);
+                unregister((GitLabSCMSource) source, owner);
             }
+        }
+    }
+
+    @Override
+    public void onUpdated(Item item) {
+        if (item instanceof SCMNavigatorOwner) {
+            onUpdated((SCMNavigatorOwner) item);
+        }
+    }
+
+    private void onUpdated(SCMNavigatorOwner owner) {
+        for (SCMNavigator navigator : owner.getSCMNavigators()) {
+            if (navigator instanceof GitLabSCMNavigator) {
+                onUpdated((GitLabSCMNavigator) navigator, owner);
+            }
+        }
+    }
+
+    private void onUpdated(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
+        if (navigator.saved()) {
+            if (navigator.getListenToWebHooks()) {
+                register(navigator, owner);
+            } else {
+                unregister(navigator, owner);
+            }
+        }
+    }
+
+    private void register(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
+        GitLabSCMWebHook.get().addListener(navigator, owner);
+    }
+
+    private void register(GitLabSCMSource source, SCMSourceOwner owner) {
+        if (source.getListenToWebHooks()) {
+            GitLabSCMWebHook.get().addListener(source, owner);
+        }
+    }
+
+    private void unregister(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
+        if (navigator.getListenToWebHooks() && !StringUtils.isEmpty(navigator.getConnectionName())) {
+            GitLabSCMWebHook.get().removeListener(navigator, owner);
+        }
+    }
+
+    private void unregister(GitLabSCMSource source, SCMSourceOwner owner) {
+        if (source.getListenToWebHooks()) {
+            GitLabSCMWebHook.get().removeListener(source, owner);
         }
     }
 }

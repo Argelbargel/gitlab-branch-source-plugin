@@ -29,6 +29,7 @@ class SourceSettings {
     private final MonitorStrategy forksMonitorStrategy;
     private final MonitorStrategy tagMonitorStrategy;
     private boolean buildBranchesWithMergeRequests;
+    private boolean listenToWebHooks;
     private boolean registerWebHooks;
     private boolean updateBuildDescription;
     private boolean publishUnstableBuildsAsSuccess;
@@ -45,6 +46,7 @@ class SourceSettings {
         this.originMonitorStrategy = new MonitorStrategy(true, true, stages);
         this.forksMonitorStrategy = new MonitorStrategy(false, true, stages);
         this.tagMonitorStrategy = new MonitorStrategy(false, false, no);
+        this.listenToWebHooks = true;
         this.registerWebHooks = true;
         this.updateBuildDescription = true;
         this.publishUnstableBuildsAsSuccess = false;
@@ -98,6 +100,14 @@ class SourceSettings {
 
     MonitorStrategy forksMonitorStrategy() {
         return forksMonitorStrategy;
+    }
+
+    boolean getListenToWebHooks() {
+        return listenToWebHooks;
+    }
+
+    void setListenToWebHooks(boolean value) {
+        listenToWebHooks = value;
     }
 
     boolean getRegisterWebHooks() {

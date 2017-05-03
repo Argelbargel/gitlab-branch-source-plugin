@@ -53,8 +53,10 @@ class HookManager {
             try {
                 GitLabAPI api = gitLabAPI(listener.connectionName());
                 if (listener.listensToSystem()) {
+                    LOGGER.info("registering system-hook for " + listener.id() + "...");
                     api.registerSystemHook(listener.url());
                 } else {
+                    LOGGER.info("registering project-hook for " + listener.id() + "...");
                     api.registerProjectHook(listener.url(), listener.projectId());
                 }
                 managed.register();
@@ -83,12 +85,14 @@ class HookManager {
 
     private void unregisterHook(GitLabSCMWebHookListener listener) {
         ListenerState managed = managedListeners.get(listener.id());
-        if (managed != null && managed.isRegistered()) {
+        if (managed != null && !managed.hasUsages() && managed.isRegistered()) {
             try {
                 GitLabAPI api = gitLabAPI(listener.connectionName());
                 if (listener.listensToSystem()) {
+                    LOGGER.info("un-registering system-hook for " + listener.id() + "...");
                     api.unregisterSystemHook(listener.url());
                 } else {
+                    LOGGER.info("un-registering project-hook for " + listener.id() + "...");
                     api.unregisterProjectHook(listener.url(), listener.projectId());
                 }
                 managed.unregister();
@@ -113,11 +117,17 @@ class HookManager {
         }
 
         void acquire(Item owner) {
-            users.add(owner.getFullName());
+            if (!users.contains(owner.getFullName())) {
+                LOGGER.info("acquiring listener for " + owner.getFullName() + "...");
+                users.add(owner.getFullName());
+            }
         }
 
         void release(Item owner) {
-            users.remove(owner.getFullName());
+            if (users.contains(owner.getFullName())) {
+                LOGGER.info("releasing listener for " + owner.getFullName() + "...");
+                users.remove(owner.getFullName());
+            }
         }
 
         boolean hasUsages() {
