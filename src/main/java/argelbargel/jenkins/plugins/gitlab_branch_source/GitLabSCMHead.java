@@ -25,7 +25,7 @@ public abstract class GitLabSCMHead extends SCMHead implements SCMHeadMixin {
     }
 
     static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, int iid, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
-        return new GitLabSCMMergeRequestHead(id, name + " (!" + iid + ")", source, target, mergeable);
+        return new GitLabSCMMergeRequestHead(id, "!" + iid + " - " + name, source, target, mergeable);
     }
 
     static GitLabSCMBranchHead createBranch(int projectId, String name, String hash, boolean hasMergeRequest) {
