@@ -21,7 +21,7 @@ class SourceSettings {
     private static final String DEFAULT_MERGE_COMMIT_MESSAGE = "Accepted Merge-Request #{0} after build {1} succeeded";
 
     private final String connectionName;
-    private final String credentialsId;
+    private String credentialsId;
     private String includes;
     private String excludes;
     private final MonitorStrategy branchMonitorStrategy;
@@ -60,6 +60,10 @@ class SourceSettings {
 
     String getCredentialsId() {
         return !CHECKOUT_CREDENTIALS_ANONYMOUS.equals(credentialsId) ? credentialsId : null;
+    }
+    
+    void setCredentialsId(String credentialsId){
+        this.credentialsId = credentialsId;
     }
 
     String getIncludes() {

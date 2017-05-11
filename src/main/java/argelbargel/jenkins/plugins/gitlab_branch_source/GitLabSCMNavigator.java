@@ -86,6 +86,11 @@ public class GitLabSCMNavigator extends SCMNavigator {
     public String getProjectGroup() {
         return (projectGroup != null) ? projectGroup : "";
     }
+    
+    @DataBoundSetter
+    public void setCheckoutCredentialsId(String credentialsId){
+        sourceSettings.setCredentialsId(credentialsId);
+    }
 
     @DataBoundSetter
     public void setProjectGroup(String group) {
