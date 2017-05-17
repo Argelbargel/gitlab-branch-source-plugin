@@ -52,7 +52,7 @@ public final class GitLabSCMBuildStatusPublisher {
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    public void publish(Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
+    void publish(Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
         executorService.execute(new Message(run, projectId, hash, state, ref, context, description));
     }
 
