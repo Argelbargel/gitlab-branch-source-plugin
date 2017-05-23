@@ -1,7 +1,7 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.actions;
 
 
-import com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty;
+import com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig;
 import com.dabsquared.gitlabjenkins.gitlab.api.GitLabApi;
 import com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState;
 import hudson.init.Terminator;
@@ -52,8 +52,8 @@ public final class GitLabSCMBuildStatusPublisher {
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    void publish(Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
-        executorService.execute(new Message(run, projectId, hash, state, ref, context, description));
+    void publish(String connectionName, Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
+        executorService.execute(new Message(connectionName, run, projectId, hash, state, ref, context, description));
     }
 
     private void shutdown() throws InterruptedException {
@@ -63,6 +63,7 @@ public final class GitLabSCMBuildStatusPublisher {
 
 
     private static final class Message implements Runnable {
+        private final String connectionName;
         private final Run<?, ?> run;
         private final int projectId;
         private final String hash;
@@ -72,7 +73,8 @@ public final class GitLabSCMBuildStatusPublisher {
         private final String description;
 
 
-        private Message(Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
+        private Message(String connectionName, Run<?, ?> run, int projectId, String hash, BuildState state, String ref, String context, String description) {
+            this.connectionName = connectionName;
             this.run = run;
             this.projectId = projectId;
             this.ref = ref;
@@ -84,7 +86,7 @@ public final class GitLabSCMBuildStatusPublisher {
 
         @Override
         public void run() {
-            GitLabApi client = GitLabConnectionProperty.getClient(run);
+            GitLabApi client = getClient(connectionName);
             if (client == null) {
                 LOGGER.log(WARNING, "cannot publish build-status pending as no gitlab-connection is configured!");
             } else {
@@ -94,6 +96,11 @@ public final class GitLabSCMBuildStatusPublisher {
                     LOGGER.log(SEVERE, "failed to set build-status of '" + context + "' for project " + projectId + " to " + state, e);
                 }
             }
+        }
+
+        private GitLabApi getClient(String connectionName) {
+            GitLabConnectionConfig config = (GitLabConnectionConfig) Jenkins.getInstance().getDescriptor(GitLabConnectionConfig.class);
+            return config != null ? config.getClient(connectionName) : null;
         }
     }
 }

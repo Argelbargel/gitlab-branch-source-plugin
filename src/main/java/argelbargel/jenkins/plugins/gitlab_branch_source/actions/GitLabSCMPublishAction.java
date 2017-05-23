@@ -43,11 +43,13 @@ import static java.util.logging.Level.SEVERE;
 public final class GitLabSCMPublishAction extends InvisibleAction implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMPublishAction.class.getName());
 
+    private final String connectionName;
     private final boolean markUnstableAsSuccess;
     private final boolean updateBuildDescription;
     private final BuildStatusPublishMode mode;
 
-    public GitLabSCMPublishAction(boolean updateBuildDescription, BuildStatusPublishMode mode, boolean markUnstableAsSuccess) {
+    public GitLabSCMPublishAction(String connectionName, boolean updateBuildDescription, BuildStatusPublishMode mode, boolean markUnstableAsSuccess) {
+        this.connectionName = connectionName;
         this.markUnstableAsSuccess = markUnstableAsSuccess;
         this.updateBuildDescription = updateBuildDescription;
         this.mode = mode;
@@ -108,7 +110,7 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
     }
 
     private void publishBuildStatus(Run<?, ?> run, GitLabSCMHeadMetadataAction metadata, BuildState state, String context, String description) {
-        GitLabSCMBuildStatusPublisher.instance().publish(run, metadata.getProjectId(), metadata.getHash(), state, metadata.getBranch(), context, description);
+        GitLabSCMBuildStatusPublisher.instance().publish(connectionName, run, metadata.getProjectId(), metadata.getHash(), state, metadata.getBranch(), context, description);
     }
 
     private final class GitLabSCMGraphListener implements GraphListener {
