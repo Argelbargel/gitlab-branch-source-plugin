@@ -65,6 +65,7 @@ class SourceActions {
         List<Action> actions = new ArrayList<>();
 
         actions.add(new GitLabSCMPublishAction(
+                source.getSourceSettings().getConnectionName(),
                 source.getSourceSettings().getUpdateBuildDescription(),
                 buildStatusPublishMode(head),
                 source.getSourceSettings().getPublishUnstableBuildsAsSuccess()
