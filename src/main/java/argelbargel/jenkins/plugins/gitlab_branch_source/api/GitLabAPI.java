@@ -15,6 +15,7 @@ import org.gitlab.api.models.GitlabTag;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public final class GitLabAPI {
     }
 
     public GitLabProject getProject(String name) throws GitLabAPIException {
-        return getProject((Serializable) name);
+        return getProject((Serializable) encode(name));
     }
 
     private GitLabProject getProject(Serializable nameOrId) throws GitLabAPIException {
@@ -310,5 +311,13 @@ public final class GitLabAPI {
         }
 
         return urlBuilder.toString();
+    }
+
+    private String encode(String in) throws GitLabAPIException {
+        try {
+            return URLEncoder.encode(in, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new GitLabAPIException(e);
+        }
     }
 }

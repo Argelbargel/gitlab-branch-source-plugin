@@ -80,7 +80,7 @@ public final class GitLabSCMItemListener extends ItemListener {
     private boolean updateProperties(Job<?, ?> job, SCMSourceOwner sourceOwner, String sourceId) {
         SCMSource source = sourceOwner.getSCMSource(sourceId);
         if (source instanceof GitLabSCMSource) {
-            String connectionName = ((GitLabSCMSource) source).getConnectionName();
+            String connectionName = ((GitLabSCMSource) source).getSourceSettings().getConnectionName();
             GitLabConnectionProperty property = job.getProperty(GitLabConnectionProperty.class);
             if (property == null || !connectionName.equals(property.getGitLabConnection())) {
                 updateProperties(job, connectionName);

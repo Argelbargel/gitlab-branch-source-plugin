@@ -31,11 +31,11 @@ public class GitLabSCMBranchBuildStrategy extends BranchBuildStrategy {
     @SuppressWarnings("SimplifiableIfStatement")
     private boolean isAutomaticBuild(GitLabSCMSource source, SCMHead head) {
         if (head instanceof TagSCMHead) {
-            return source.getBuildTags();
+            return source.getSourceSettings().getTagMonitorStrategy().getBuild();
         }
 
         if (head instanceof GitLabSCMBranchHead) {
-            return !((GitLabSCMBranchHead) head).hasMergeRequest() || source.getBuildBranchesWithMergeRequests();
+            return !((GitLabSCMBranchHead) head).hasMergeRequest() || source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests();
         }
 
         if (head instanceof GitLabSCMMergeRequestHead) {
@@ -55,7 +55,7 @@ public class GitLabSCMBranchBuildStrategy extends BranchBuildStrategy {
         }
 
         boolean fromOrigin = source.getProjectId() == head.getProjectId();
-        return (fromOrigin && !source.getBuildOnlyMergeableRequestsFromOriginMerged()) || (!fromOrigin && !source.getBuildOnlyMergeableRequestsFromForksMerged());
+        return (fromOrigin && !source.getSourceSettings().getOriginMonitorStrategy().getBuildOnlyMergeableMerged()) || (!fromOrigin && !source.getSourceSettings().getForksMonitorStrategy().getBuildOnlyMergeableMerged());
     }
 
     boolean isApplicable(BranchSource branchSource) {

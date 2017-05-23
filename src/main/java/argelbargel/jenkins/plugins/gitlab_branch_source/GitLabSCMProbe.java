@@ -38,7 +38,7 @@ class GitLabSCMProbe extends SCMProbe {
         }
 
         int projectId = (head instanceof GitLabSCMHead) ? ((GitLabSCMHead) head).getProjectId() : source.getProjectId();
-        return new GitLabSCMProbe(source.getConnectionName(), projectId, head.getName(), ((SCMRevisionImpl) revision).getHash());
+        return new GitLabSCMProbe(source.getSourceSettings().getConnectionName(), projectId, head.getName(), ((SCMRevisionImpl) revision).getHash());
     }
 
 

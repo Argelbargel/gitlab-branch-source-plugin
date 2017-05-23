@@ -15,12 +15,15 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWe
 public final class GitLabSCMWebHookListener {
     private final String connectionName;
     private final int projectId;
-    private String idCache;
+    private transient String idCache;
+    private boolean listen;
+    private boolean register;
 
     GitLabSCMWebHookListener(String connectionName, int projectId) {
         this.connectionName = connectionName;
         this.projectId = projectId;
-
+        this.listen = true;
+        this.register = true;
     }
 
     String connectionName() {
@@ -33,6 +36,22 @@ public final class GitLabSCMWebHookListener {
 
     boolean listensToSystem() {
         return projectId < 1;
+    }
+
+    public boolean getListen() {
+        return listen;
+    }
+
+    public void setListen(boolean value) {
+        listen = value;
+    }
+
+    public boolean getRegister() {
+        return register;
+    }
+
+    public void setRegister(boolean value) {
+        register = value;
     }
 
     public String id() {

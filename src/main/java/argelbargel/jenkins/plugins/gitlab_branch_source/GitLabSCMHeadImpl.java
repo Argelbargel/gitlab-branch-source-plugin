@@ -103,7 +103,7 @@ abstract class GitLabSCMHeadImpl extends GitLabSCMHead {
         }
 
         if (!projectCache.containsKey(projectId)) {
-            projectCache.put(projectId, gitLabAPI(source.getConnectionName()).getProject(projectId));
+            projectCache.put(projectId, gitLabAPI(source.getSourceSettings().getConnectionName()).getProject(projectId));
         }
 
         return projectCache.get(projectId);

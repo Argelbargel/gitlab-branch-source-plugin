@@ -1,88 +1,52 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source;
 
-class MonitorStrategy {
+
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import hudson.model.AbstractDescribableImpl;
+import hudson.model.Descriptor;
+import hudson.util.ListBoxModel;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+
+import javax.annotation.Nonnull;
+
+
+public class MonitorStrategy extends AbstractDescribableImpl<MonitorStrategy> {
     private boolean monitor;
-    private boolean merged;
-    private boolean unmerged;
-    private boolean ignoreWIP;
-    private boolean onlyMergeable;
-    private boolean acceptMergeRequests;
-    private boolean removeSourceBranch;
+    private boolean build;
     private BuildStatusPublishMode buildStatusPublishMode;
 
-
-    MonitorStrategy(boolean monitor, boolean merge, BuildStatusPublishMode publish) {
-        this.monitor = monitor;
-        this.merged = merge;
-        this.unmerged = !merge;
-        this.ignoreWIP = true;
-        this.onlyMergeable = false;
-        this.buildStatusPublishMode = publish;
-        this.acceptMergeRequests = false;
-        this.removeSourceBranch = false;
+    MonitorStrategy(boolean monitored, boolean build, BuildStatusPublishMode buildStatusPublishMode) {
+        this.monitor = monitored;
+        this.build = build;
+        this.buildStatusPublishMode = buildStatusPublishMode;
     }
 
-    void setMonitored(boolean value) {
-        monitor = value;
-    }
-
-    boolean monitored() {
+    public final boolean getMonitored() {
         return monitor;
     }
 
-    void setBuildMerged(boolean value) {
-        merged = value;
+    public final boolean getBuild() {
+        return build;
     }
 
-    boolean buildMerged() {
-        return merged;
-    }
-
-    void setBuildUnmerged(boolean value) {
-        unmerged = value;
-    }
-
-    boolean buildUnmerged() {
-        return unmerged;
-    }
-
-    void setIgnoreWorkInProgress(boolean value) {
-        ignoreWIP = value;
-    }
-
-    boolean ignoreWorkInProgress() {
-        return ignoreWIP;
-    }
-
-    void setBuildOnlyMergeableRequestsMerged(boolean value) {
-        onlyMergeable = value;
-    }
-
-    boolean buildOnlyMergeableRequestsMerged() {
-        return onlyMergeable;
-    }
-
-    void setAcceptMergeRequests(boolean value) {
-        acceptMergeRequests = value;
-    }
-
-    boolean getRemoveSourceBranch() {
-        return removeSourceBranch;
-    }
-
-    void setRemoveSourceBranch(boolean value) {
-        removeSourceBranch = value;
-    }
-
-    boolean getAcceptMergeRequests() {
-        return acceptMergeRequests;
-    }
-
-    void setBuildStatusPublishMode(BuildStatusPublishMode value) {
-        buildStatusPublishMode = value;
-    }
-
-    BuildStatusPublishMode getBuildStatusPublishMode() {
+    public final BuildStatusPublishMode getBuildStatusPublishMode() {
         return buildStatusPublishMode;
+    }
+
+
+    protected static abstract class MonitorStrategyDescriptor<T extends MonitorStrategy> extends Descriptor<MonitorStrategy> {
+        @Nonnull
+        public abstract T getDefaults();
+
+        @Restricted(NoExternalUse.class)
+        public final ListBoxModel doFillBuildStatusPublishModeItems() {
+            StandardListBoxModel result = new StandardListBoxModel();
+            for (BuildStatusPublishMode mode : BuildStatusPublishMode.values()) {
+                result.add(mode.name());
+            }
+
+            return result;
+        }
     }
 }

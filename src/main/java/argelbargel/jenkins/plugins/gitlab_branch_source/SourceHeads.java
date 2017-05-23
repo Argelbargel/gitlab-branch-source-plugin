@@ -167,7 +167,7 @@ class SourceHeads {
     private void retrieveMergeRequests(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         branchesWithMergeRequestsCache = new HashMap<>();
 
-        if (source.getProject().isMergeRequestsEnabled() && (source.getMonitorAndBuildMergeRequestsFromOrigin() || source.getMonitorAndBuildMergeRequestsFromForks())) {
+        if (source.getProject().isMergeRequestsEnabled() && (source.getSourceSettings().getOriginMonitorStrategy().getMonitored() || source.getSourceSettings().getForksMonitorStrategy().getMonitored())) {
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequests());
 
             GitLabMergeRequestFilter filter = source.createMergeRequestFilter(listener);
@@ -182,7 +182,7 @@ class SourceHeads {
     }
 
     private void retrieveBranches(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        if (source.getMonitorAndBuildBranches()) {
+        if (source.getSourceSettings().getBranchMonitorStrategy().getMonitored()) {
             log(listener, Messages.GitLabSCMSource_retrievingBranches());
 
             for (GitlabBranch branch : api().getBranches(source.getProjectId())) {
@@ -196,7 +196,7 @@ class SourceHeads {
     }
 
     private void retrieveTags(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
-        if (source.getMonitorTags()) {
+        if (source.getSourceSettings().getTagMonitorStrategy().getMonitored()) {
             log(listener, Messages.GitLabSCMSource_retrievingTags());
             for (GitlabTag tag : api().getTags(source.getProjectId())) {
                 checkInterrupt();
@@ -212,7 +212,7 @@ class SourceHeads {
         log(listener, Messages.GitLabSCMSource_monitoringBranch(branch.getName()));
 
         boolean hasMergeRequest = branchesWithMergeRequests(NULL).containsValue(branch.getName());
-        if (hasMergeRequest && !source.getBuildBranchesWithMergeRequests()) {
+        if (hasMergeRequest && !source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests()) {
             log(listener, Messages.GitLabSCMSource_willNotBuildBranchWithMergeRequest(branch.getName()));
         }
 
@@ -246,7 +246,7 @@ class SourceHeads {
             observe(criteria, observer, head.merged(), listener);
         }
 
-        if (!source.getBuildBranchesWithMergeRequests() && head.fromOrigin()) {
+        if (!source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests() && head.fromOrigin()) {
             branchesWithMergeRequests(listener).put(mergeRequest.getId(), mergeRequest.getSourceBranch());
         }
     }
@@ -274,7 +274,7 @@ class SourceHeads {
     }
 
     private GitLabAPI api() throws GitLabAPIException {
-        return gitLabAPI(source.getConnectionName());
+        return gitLabAPI(source.getSourceSettings().getConnectionName());
     }
 
     private void log(@Nonnull TaskListener listener, String message) {
@@ -282,7 +282,7 @@ class SourceHeads {
     }
 
     private Map<Integer, String> branchesWithMergeRequests(TaskListener listener) throws IOException, InterruptedException {
-        if (source.getBuildBranchesWithMergeRequests()) {
+        if (source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests()) {
             return emptyMap();
         }
 
@@ -298,8 +298,8 @@ class SourceHeads {
         if (head instanceof GitLabSCMMergeRequestHead) {
             return source.determineMergeRequestStrategyValue(
                     ((GitLabSCMMergeRequestHead) head),
-                    source.getBuildOnlyMergeableRequestsFromOriginMerged(),
-                    source.getBuildOnlyMergeableRequestsFromForksMerged());
+                    source.getSourceSettings().getOriginMonitorStrategy().getBuildOnlyMergeableMerged(),
+                    source.getSourceSettings().getForksMonitorStrategy().getBuildOnlyMergeableMerged());
         }
 
         return true;

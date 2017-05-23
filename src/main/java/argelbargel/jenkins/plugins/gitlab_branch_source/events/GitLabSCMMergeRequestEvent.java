@@ -51,7 +51,7 @@ public final class GitLabSCMMergeRequestEvent extends GitLabSCMHeadEvent<MergeRe
         }
 
         boolean isOrigin = isOrigin(source, getAttributes().getSourceProjectId());
-        return ((isOrigin && source.getMonitorAndBuildMergeRequestsFromOrigin()) || (!isOrigin && source.getMonitorAndBuildMergeRequestsFromForks()));
+        return ((isOrigin && source.getSourceSettings().getOriginMonitorStrategy().getMonitored()) || (!isOrigin && source.getSourceSettings().getForksMonitorStrategy().getMonitored()));
     }
 
     private boolean isOrigin(@Nonnull GitLabSCMSource source, Integer projectId) {

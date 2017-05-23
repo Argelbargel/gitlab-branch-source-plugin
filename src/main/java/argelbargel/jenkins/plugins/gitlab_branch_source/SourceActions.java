@@ -47,7 +47,7 @@ class SourceActions {
         GitLabProject project = source.getProject();
         return asList(
                 new ObjectMetadataAction(project.getNameWithNamespace(), project.getDescription(), project.getWebUrl()),
-                new GitLabProjectAvatarMetadataAction(project.getId(), source.getConnectionName()),
+                new GitLabProjectAvatarMetadataAction(project.getId(), source.getSourceSettings().getConnectionName()),
                 GitLabLinkAction.toProject(project));
     }
 
@@ -65,9 +65,9 @@ class SourceActions {
         List<Action> actions = new ArrayList<>();
 
         actions.add(new GitLabSCMPublishAction(
-                source.getUpdateBuildDescription(),
+                source.getSourceSettings().getUpdateBuildDescription(),
                 buildStatusPublishMode(head),
-                source.getPublishUnstableBuildsAsSuccess()
+                source.getSourceSettings().getPublishUnstableBuildsAsSuccess()
         ));
 
         Action linkAction;
@@ -128,19 +128,19 @@ class SourceActions {
 
     private GitLabMergeRequest retrieveMergeRequest(@Nonnull ChangeRequestSCMHead head, @Nonnull TaskListener listener) throws GitLabAPIException {
         listener.getLogger().format(Messages.GitLabSCMSource_retrievingMergeRequest(head.getId()) + "\n");
-        return gitLabAPI(source.getConnectionName()).getMergeRequest(source.getProjectId(), head.getId());
+        return gitLabAPI(source.getSourceSettings().getConnectionName()).getMergeRequest(source.getProjectId(), head.getId());
     }
 
     private BuildStatusPublishMode buildStatusPublishMode(SCMHead head) {
         if (head instanceof GitLabSCMMergeRequestHead) {
             return ((GitLabSCMMergeRequestHead) head).fromOrigin()
-                    ? source.getOriginBuildStatusPublishMode()
-                    : source.getForkBuildStatusPublishMode();
+                    ? source.getSourceSettings().getOriginMonitorStrategy().getBuildStatusPublishMode()
+                    : source.getSourceSettings().getForksMonitorStrategy().getBuildStatusPublishMode();
         } else if (head instanceof TagSCMHead) {
-            return source.getTagBuildStatusPublishMode();
+            return source.getSourceSettings().getTagMonitorStrategy().getBuildStatusPublishMode();
         }
 
-        return source.getBranchBuildStatusPublishMode();
+        return source.getSourceSettings().getBranchMonitorStrategy().getBuildStatusPublishMode();
     }
 
     private boolean acceptMergeRequest(SCMHead head) {
@@ -149,8 +149,8 @@ class SourceActions {
             return mergeRequest.isMerged() &&
                     source.determineMergeRequestStrategyValue(
                             mergeRequest,
-                            source.getAcceptMergeRequestsFromOrigin(),
-                            source.getAcceptMergeRequestsFromForks());
+                            source.getSourceSettings().getOriginMonitorStrategy().getAcceptMergeRequests(),
+                            source.getSourceSettings().getForksMonitorStrategy().getAcceptMergeRequests());
         }
         return false;
     }
@@ -158,7 +158,7 @@ class SourceActions {
     private boolean removeSourceBranch(SCMHead head) {
         if (head instanceof GitLabSCMMergeRequestHead) {
             GitLabSCMMergeRequestHead mergeRequest = (GitLabSCMMergeRequestHead) head;
-            return mergeRequest.isMerged() && mergeRequest.fromOrigin() && source.getRemoveSourceBranchFromOrigin();
+            return mergeRequest.isMerged() && mergeRequest.fromOrigin() && source.getSourceSettings().getOriginMonitorStrategy().getRemoveSourceBranch();
         }
 
         return false;

@@ -33,11 +33,11 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
 
 
     public static GitLabSCMWebHookListener createListener(GitLabSCMNavigator navigator) {
-        return new GitLabSCMWebHookListener(navigator.getConnectionName(), 0);
+        return new GitLabSCMWebHookListener(navigator.getSourceSettings().getConnectionName(), 0);
     }
 
     public static GitLabSCMWebHookListener createListener(GitLabSCMSource source) {
-        return new GitLabSCMWebHookListener(source.getConnectionName(), source.getProjectId());
+        return new GitLabSCMWebHookListener(source.getSourceSettings().getConnectionName(), source.getProjectId());
     }
 
     public static GitLabSCMWebHook get() {
@@ -55,7 +55,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
     }
 
     public void addListener(GitLabSCMNavigator navigator, Item owner) {
-        manager.addListener(navigator.getHookListener(), owner, navigator.getRegisterWebHooks());
+        manager.addListener(navigator.getHookListener(), owner, navigator.getWebhookSettings().getRegisterWebHooks());
     }
 
     public void addListener(GitLabSCMSource source, Item owner) {
@@ -63,7 +63,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
     }
 
     public void removeListener(GitLabSCMNavigator navigator, Item owner) {
-        manager.removeListener(navigator.getHookListener(), owner, navigator.getRegisterWebHooks());
+        manager.removeListener(navigator.getHookListener(), owner, navigator.getWebhookSettings().getRegisterWebHooks());
     }
 
     public void removeListener(GitLabSCMSource source, Item owner) {
@@ -154,7 +154,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
         }
 
         private void handle(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
-            if (navigator.getListenToWebHooks() && !StringUtils.isEmpty(navigator.getConnectionName())) {
+            if (navigator.getWebhookSettings().getListenToWebHooks() && !StringUtils.isEmpty(navigator.getSourceSettings().getConnectionName())) {
                 addListener(navigator, owner);
             }
         }

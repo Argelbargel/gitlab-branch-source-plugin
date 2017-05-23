@@ -41,7 +41,7 @@ class EventHelper {
 
     private static GitlabProject getGitlabProject(GitLabSCMNavigator navigator, Integer id) {
         try {
-            return gitLabAPI(navigator.getConnectionName()).getProject(id);
+            return gitLabAPI(navigator.getSourceSettings().getConnectionName()).getProject(id);
         } catch (IOException e) {
             LOGGER.info("could not get project with id " + id);
             return null;

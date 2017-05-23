@@ -74,7 +74,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
 
     private void onUpdated(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
         if (navigator.saved()) {
-            if (navigator.getListenToWebHooks()) {
+            if (navigator.getWebhookSettings().getListenToWebHooks()) {
                 register(navigator, owner);
             } else {
                 unregister(navigator, owner);
@@ -93,7 +93,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
     }
 
     private void unregister(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
-        if (navigator.getListenToWebHooks() && !StringUtils.isEmpty(navigator.getConnectionName())) {
+        if (navigator.getWebhookSettings().getListenToWebHooks() && !StringUtils.isEmpty(navigator.getSourceSettings().getConnectionName())) {
             GitLabSCMWebHook.get().removeListener(navigator, owner);
         }
     }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+    <f:section title="GitLab-Connection">
+        <f:block>
+            <table style="width: 100%">
+                <f:entry title="${%Connection}" field="connectionName">
+                    <f:select default="${descriptor.defaults.connectionName}"/>
+                </f:entry>
+                <f:entry title="${%Checkout credentials}" field="checkoutCredentialsId">
+                    <c:select default="${descriptor.defaults.checkoutCredentialsId}"/>
+                </f:entry>
+            </table>
+        </f:block>
+    </f:section>
+    <f:advanced>
+        <f:section title="Monitoring &amp; Build-Strategy">
+            <f:block>
+                <table>
+                    <f:property field="branchMonitorStrategy"/>
+                </table>
+            </f:block>
+            <f:block>
+                <table>
+                    <f:property field="originMonitorStrategy"/>
+                </table>
+            </f:block>
+            <f:block>
+                <table>
+                    <f:property field="forksMonitorStrategy"/>
+                </table>
+            </f:block>
+            <f:block>
+                <table>
+                    <f:property field="tagMonitorStrategy"/>
+                </table>
+            </f:block>
+        </f:section>
+        <f:section title="Miscellaneous">
+            <f:block>
+                <table style="width: 100%">
+                    <f:entry title="${%Update Build Descriptions}" field="updateBuildDescription">
+                        <f:checkbox default="${descriptor.defaults.updateBuildDescription}"/>
+                    </f:entry>
+                    <f:entry title="${%Merge Commit Message}" field="mergeCommitMessage">
+                        <f:textbox default="${descriptor.defaults.mergeCommitMessage}"/>
+                    </f:entry>
+                    <f:entry title="${%Publish unstable builds as success}" field="publishUnstableBuildsAsSuccess">
+                        <f:checkbox default="${descriptor.defaults.publishUnstableBuildAsSuccess}"/>
+                    </f:entry>
+                </table>
+            </f:block>
+        </f:section>
+    </f:advanced>
+</j:jelly>

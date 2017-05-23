@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:optionalBlock title="${%Monitor &amp; Build Origin Branches}" field="monitored" inline="true"
+                     checked="${descriptor.defaults.monitored}">
+        <f:nested>
+            <table>
+                <f:entry title="${%Include branches}" field="includes">
+                    <f:textbox default="${descriptor.defaults.includes}"/>
+                </f:entry>
+                <f:entry title="${%Exclude branches}" field="excludes">
+                    <f:textbox default="${descriptor.defaults.excludes}"/>
+                </f:entry>
+                <f:entry title="${%Build Branches also filed as Merge Requests}" field="buildBranchesWithMergeRequests">
+                    <f:checkbox default="${descriptor.defaults.buildBranchesWithMergeRequests}"/>
+                </f:entry>
+                <f:entry title="${%Publish build status}" field="buildStatusPublishMode">
+                    <f:select default="${descriptor.defaults.buildStatusPublishMode}"/>
+                </f:entry>
+            </table>
+        </f:nested>
+    </f:optionalBlock>
+</j:jelly>

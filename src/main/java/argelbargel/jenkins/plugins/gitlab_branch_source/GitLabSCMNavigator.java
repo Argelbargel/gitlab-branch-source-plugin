@@ -9,7 +9,6 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHookLi
 import hudson.Extension;
 import hudson.model.Action;
 import hudson.model.TaskListener;
-import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.scm.api.SCMNavigator;
 import jenkins.scm.api.SCMNavigatorDescriptor;
@@ -17,15 +16,12 @@ import jenkins.scm.api.SCMNavigatorEvent;
 import jenkins.scm.api.SCMNavigatorOwner;
 import jenkins.scm.api.SCMSourceCategory;
 import jenkins.scm.api.SCMSourceObserver;
-import jenkins.scm.api.SCMSourceOwner;
 import jenkins.scm.impl.UncategorizedSCMSourceCategory;
 import org.jenkins.ui.icon.IconSpec;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -34,19 +30,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.defaultGitLabConnectionName;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabConnection;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMIcons.ICON_GITLAB;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMIcons.iconFilePathPattern;
 
 
-// TODO: extract common interface for GitLabSCMSource, GitLabSCMNavigator and SourceSettings
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class GitLabSCMNavigator extends SCMNavigator {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMNavigator.class.getName());
     private static final String DEFAULT_SEARCH_PATTERN = "";
 
-    private final SourceSettings sourceSettings;
+    private final GitLabSCMSourceSettings sourceSettings;
     private final GitLabSCMWebHookListener hookListener;
     private String projectSearchPattern;
     private String projectSelectorId;
@@ -54,13 +48,10 @@ public class GitLabSCMNavigator extends SCMNavigator {
     private String projectGroup;
     private boolean saved;
 
-    @DataBoundConstructor
-    public GitLabSCMNavigator(String connectionName) {
-        this(new SourceSettings(connectionName));
-    }
 
-    private GitLabSCMNavigator(SourceSettings settings) {
-        this.sourceSettings = settings;
+    @DataBoundConstructor
+    public GitLabSCMNavigator(GitLabSCMSourceSettings sourceSettings) {
+        this.sourceSettings = sourceSettings;
         this.hookListener = GitLabSCMWebHook.createListener(this);
         this.projectSearchPattern = DEFAULT_SEARCH_PATTERN;
         this.projectSelectorId = GitLabProjectSelector.VISIBLE.id();
@@ -69,27 +60,16 @@ public class GitLabSCMNavigator extends SCMNavigator {
         this.saved = false;
     }
 
-    SourceSettings getSourceSettings() {
+    public GitLabSCMSourceSettings getSourceSettings() {
         return sourceSettings;
     }
 
-    @Nonnull
-    public String getConnectionName() {
-        return sourceSettings.getConnectionName();
-    }
-
-    @CheckForNull
-    public String getCheckoutCredentialsId() {
-        return sourceSettings.getCredentialsId();
+    public GitLabSCMWebHookSettings getWebhookSettings() {
+        return new GitLabSCMWebHookSettings();
     }
 
     public String getProjectGroup() {
         return (projectGroup != null) ? projectGroup : "";
-    }
-    
-    @DataBoundSetter
-    public void setCheckoutCredentialsId(String credentialsId){
-        sourceSettings.setCredentialsId(credentialsId);
     }
 
     @DataBoundSetter
@@ -124,273 +104,14 @@ public class GitLabSCMNavigator extends SCMNavigator {
         projectVisibilityId = id;
     }
 
-    @Nonnull
-    public String getIncludes() {
-        return sourceSettings.getIncludes();
-    }
-
-    @DataBoundSetter
-    public void setIncludes(@Nonnull String includes) {
-        sourceSettings.setIncludes(includes);
-    }
-
-    @Nonnull
-    public String getExcludes() {
-        return sourceSettings.getExcludes();
-    }
-
-    @DataBoundSetter
-    public void setExcludes(@Nonnull String excludes) {
-        sourceSettings.setExcludes(excludes);
-    }
-
-    @DataBoundSetter
-    public void setMonitorBranches(boolean monitorBranches) {
-        sourceSettings.branchMonitorStrategy().setMonitored(monitorBranches);
-        if (!monitorBranches) {
-            sourceSettings.setBuildBranchesWithMergeRequests(false);
-        }
-    }
-
-    public boolean getMonitorAndBuildBranches() {
-        return sourceSettings.branchMonitorStrategy().monitored();
-    }
-
-    @DataBoundSetter
-    public void setBuildBranchesWithMergeRequests(boolean value) {
-        sourceSettings.setBuildBranchesWithMergeRequests(sourceSettings.branchMonitorStrategy().monitored() && value);
-    }
-
-    public boolean getBuildBranchesWithMergeRequests() {
-        return sourceSettings.originMonitorStrategy().monitored() && sourceSettings.getBuildBranchesWithMergeRequests();
-    }
-
-    @DataBoundSetter
-    public void setMonitorAndBuildMergeRequestsFromOrigin(boolean value) {
-        sourceSettings.originMonitorStrategy().setMonitored(value);
-    }
-
-    public boolean getMonitorAndBuildMergeRequestsFromOrigin() {
-        return sourceSettings.originMonitorStrategy().monitored();
-    }
-
-    @DataBoundSetter
-    public void setBranchBuildStatusPublishMode(String value) {
-        sourceSettings.branchMonitorStrategy().setBuildStatusPublishMode(BuildStatusPublishMode.valueOf(value));
-    }
-
-    public String getBranchBuildStatusPublishMode() {
-        return sourceSettings.branchMonitorStrategy().getBuildStatusPublishMode().name();
-    }
-
-    @DataBoundSetter
-    public void setBuildMergeRequestsFromOriginMerged(boolean value) {
-        sourceSettings.originMonitorStrategy().setBuildMerged(value);
-    }
-
-    public boolean getBuildMergeRequestsFromOriginMerged() {
-        return sourceSettings.originMonitorStrategy().buildMerged();
-    }
-
-    @DataBoundSetter
-    public void setOriginBuildStatusPublishMode(String value) {
-        sourceSettings.originMonitorStrategy().setBuildStatusPublishMode(BuildStatusPublishMode.valueOf(value));
-    }
-
-    public String getOriginBuildStatusPublishMode() {
-        return sourceSettings.originMonitorStrategy().getBuildStatusPublishMode().name();
-    }
-
-    @DataBoundSetter
-    public void setBuildOnlyMergeableRequestsFromOriginMerged(boolean value) {
-        sourceSettings.originMonitorStrategy().setBuildOnlyMergeableRequestsMerged(value);
-    }
-
-    public boolean getBuildOnlyMergeableRequestsFromOriginMerged() {
-        return sourceSettings.originMonitorStrategy().buildOnlyMergeableRequestsMerged();
-    }
-
-    @DataBoundSetter
-    public void setBuildMergeRequestsFromOriginUnmerged(boolean value) {
-        sourceSettings.originMonitorStrategy().setBuildUnmerged(value);
-    }
-
-    public boolean getBuildMergeRequestsFromOriginUnmerged() {
-        return sourceSettings.originMonitorStrategy().buildUnmerged();
-    }
-
-    @DataBoundSetter
-    public void setIgnoreWorkInProgressFromOrigin(boolean ignoreWIPMergeRequests) {
-        sourceSettings.originMonitorStrategy().setIgnoreWorkInProgress(ignoreWIPMergeRequests);
-    }
-
-    public boolean getIgnoreWorkInProgressFromOrigin() {
-        return sourceSettings.originMonitorStrategy().ignoreWorkInProgress();
-    }
-
-    @DataBoundSetter
-    public void setAcceptMergeRequestsFromOrigin(boolean value) {
-        sourceSettings.originMonitorStrategy().setAcceptMergeRequests(value);
-    }
-
-    public boolean getAcceptMergeRequestsFromOrigin() {
-        return sourceSettings.originMonitorStrategy().getAcceptMergeRequests();
-    }
-
-    @DataBoundSetter
-    public void setRemoveSourceBranchFromOrigin(boolean value) {
-        sourceSettings.originMonitorStrategy().setRemoveSourceBranch(value);
-    }
-
-    public boolean getRemoveSourceBranchFromOrigin() {
-        return sourceSettings.originMonitorStrategy().getRemoveSourceBranch();
-    }
-
-
-    @DataBoundSetter
-    public void setMonitorAndBuildMergeRequestsFromForks(boolean value) {
-        sourceSettings.forksMonitorStrategy().setMonitored(value);
-    }
-
-    public boolean getMonitorAndBuildMergeRequestsFromForks() {
-        return sourceSettings.forksMonitorStrategy().monitored();
-    }
-
-    @DataBoundSetter
-    public void setForkBuildStatusPublishMode(String value) {
-        sourceSettings.forksMonitorStrategy().setBuildStatusPublishMode(BuildStatusPublishMode.valueOf(value));
-    }
-
-    public String getForkBuildStatusPublishMode() {
-        return sourceSettings.forksMonitorStrategy().getBuildStatusPublishMode().name();
-    }
-
-    @DataBoundSetter
-    public void setBuildMergeRequestsFromForksMerged(boolean value) {
-        sourceSettings.forksMonitorStrategy().setBuildMerged(value);
-    }
-
-    public boolean getBuildMergeRequestsFromForksMerged() {
-        return sourceSettings.forksMonitorStrategy().buildMerged();
-    }
-
-    @DataBoundSetter
-    public void setAcceptMergeRequestsFromForks(boolean value) {
-        sourceSettings.forksMonitorStrategy().setAcceptMergeRequests(value);
-    }
-
-    public boolean getAcceptMergeRequestsFromForks() {
-        return sourceSettings.forksMonitorStrategy().getAcceptMergeRequests();
-    }
-
-    @DataBoundSetter
-    public void setBuildOnlyMergeableRequestsFromForksMerged(boolean value) {
-        sourceSettings.forksMonitorStrategy().setBuildOnlyMergeableRequestsMerged(value);
-    }
-
-    public boolean getBuildOnlyMergeableRequestsFromForksMerged() {
-        return sourceSettings.forksMonitorStrategy().buildOnlyMergeableRequestsMerged();
-    }
-
-    @DataBoundSetter
-    public void setBuildMergeRequestsFromForksUnmerged(boolean value) {
-        sourceSettings.forksMonitorStrategy().setBuildUnmerged(value);
-    }
-
-    public boolean getBuildMergeRequestsFromForksUnmerged() {
-        return sourceSettings.forksMonitorStrategy().buildUnmerged();
-    }
-
-    @DataBoundSetter
-    public void setIgnoreWorkInProgressFromForks(boolean ignoreWIPMergeRequests) {
-        sourceSettings.forksMonitorStrategy().setIgnoreWorkInProgress(ignoreWIPMergeRequests);
-    }
-
-    public boolean getIgnoreWorkInProgressFromForks() {
-        return sourceSettings.forksMonitorStrategy().ignoreWorkInProgress();
-    }
-
-    @DataBoundSetter
-    public void setUpdateBuildDescription(boolean updateBuildDescription) {
-        sourceSettings.setUpdateBuildDescription(updateBuildDescription);
-    }
-
-    public boolean getUpdateBuildDescription() {
-        return sourceSettings.getUpdateBuildDescription();
-    }
-
-
     public String getHookUrl() {
         return hookListener.url().toString();
-    }
-
-    @DataBoundSetter
-    public void setMonitorTags(boolean monitorTags) {
-        sourceSettings.tagMonitorStrategy().setMonitored(monitorTags);
-    }
-
-    public boolean getMonitorTags() {
-        return sourceSettings.tagMonitorStrategy().monitored();
-    }
-
-    @DataBoundSetter
-    public void setBuildTags(boolean buildTags) {
-        sourceSettings.tagMonitorStrategy().setBuildUnmerged(buildTags);
-    }
-
-    public boolean getBuildTags() {
-        return sourceSettings.tagMonitorStrategy().buildUnmerged();
-    }
-
-    @DataBoundSetter
-    public void setTagBuildStatusPublishMode(String value) {
-        sourceSettings.tagMonitorStrategy().setBuildStatusPublishMode(BuildStatusPublishMode.valueOf(value));
-    }
-
-    public String getTagBuildStatusPublishMode() {
-        return sourceSettings.tagMonitorStrategy().getBuildStatusPublishMode().name();
-    }
-
-    @DataBoundSetter
-    public void setListenToWebHooks(boolean value) {
-        sourceSettings.setListenToWebHooks(value);
-    }
-
-    public boolean getListenToWebHooks() {
-        return sourceSettings.getListenToWebHooks();
-    }
-
-    @DataBoundSetter
-    public void setRegisterWebHooks(boolean registerWebHooks) {
-        sourceSettings.setRegisterWebHooks(registerWebHooks);
-    }
-
-    public boolean getRegisterWebHooks() {
-        return sourceSettings.getRegisterWebHooks();
-    }
-
-    @DataBoundSetter
-    public void setPublishUnstableBuildsAsSuccess(boolean value) {
-        sourceSettings.setPublishUnstableBuildsAsSuccess(value);
-    }
-
-    public boolean getPublishUnstableBuildsAsSuccess() {
-        return sourceSettings.getPublishUnstableBuildsAsSuccess();
-    }
-
-    @DataBoundSetter
-    public void setMergeCommitMessage(String value) {
-        sourceSettings.setMergeCommitMessage(value);
-    }
-
-    public String getMergeCommitMessage() {
-        return sourceSettings.getMergeCommitMessage();
     }
 
     @Nonnull
     @Override
     protected List<Action> retrieveActions(@Nonnull SCMNavigatorOwner owner, @CheckForNull SCMNavigatorEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
-        return Collections.<Action>singletonList(GitLabLinkAction.create(getPronoun(), ICON_GITLAB, gitLabConnection(getConnectionName()).getUrl()));
+        return Collections.<Action>singletonList(GitLabLinkAction.create(getPronoun(), ICON_GITLAB, gitLabConnection(getSourceSettings().getConnectionName()).getUrl()));
     }
 
     @Override
@@ -407,7 +128,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
 
     @Override
     public void afterSave(@Nonnull SCMNavigatorOwner owner) {
-        if (getListenToWebHooks()) {
+        if (getWebhookSettings().getListenToWebHooks()) {
             LOGGER.info("registering listener for " + owner.getFullName() + "...");
             GitLabSCMWebHook.get().addListener(this, owner);
             saved = true;
@@ -426,7 +147,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
     @Nonnull
     @Override
     protected String id() {
-        return getConnectionName();
+        return getSourceSettings().getConnectionName();
     }
 
     public GitLabSCMWebHookListener getHookListener() {
@@ -465,7 +186,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
 
         @Override
         public SCMNavigator newInstance(String name) {
-            return new GitLabSCMNavigator(defaultGitLabConnectionName());
+            return new GitLabSCMNavigator(new GitLabSCMSourceSettings());
         }
 
         @Nonnull
@@ -475,57 +196,6 @@ public class GitLabSCMNavigator extends SCMNavigator {
                     new UncategorizedSCMSourceCategory(Messages._GitLabSCMNavigator_UncategorizedCategory())
             };
         }
-
-        @Restricted(NoExternalUse.class)
-        public FormValidation doCheckConnectionName(@AncestorInPath SCMSourceOwner context, @QueryParameter String connectionName) {
-            return DescriptorHelper.doCheckConnectionName(connectionName);
-        }
-
-        @Restricted(NoExternalUse.class)
-        public FormValidation doCheckIncludes(@QueryParameter String includes) {
-            return DescriptorHelper.doCheckIncludes(includes);
-        }
-
-        @Restricted(NoExternalUse.class)
-        public ListBoxModel doFillConnectionNameItems() {
-            return DescriptorHelper.doFillConnectionNameItems();
-        }
-
-        @Restricted(NoExternalUse.class)
-        public ListBoxModel doFillCheckoutCredentialsIdItems(@AncestorInPath SCMSourceOwner context, @QueryParameter String connectionName, @QueryParameter String checkoutCredentialsId) {
-            return DescriptorHelper.doFillCheckoutCredentialsIdItems(context, connectionName, checkoutCredentialsId);
-        }
-
-        @Restricted(NoExternalUse.class)
-        public FormValidation doCheckProjectSelectorId(@AncestorInPath SCMSourceOwner context, @QueryParameter String projectSelectorId) {
-            return GitLabProjectSelector.ids().contains(projectSelectorId) ? FormValidation.ok() : FormValidation.error("invalid selector-id: " + projectSelectorId);
-        }
-
-        @Restricted(NoExternalUse.class)
-        public FormValidation doCheckProjectVisibilityId(@AncestorInPath SCMSourceOwner context, @QueryParameter String projectVisibilityId) {
-            return GitLabProjectVisibility.ids().contains(projectVisibilityId) ? FormValidation.ok() : FormValidation.error("invalid visibility-id: " + projectVisibilityId);
-        }
-
-        @Restricted(NoExternalUse.class)
-        public ListBoxModel doFillBranchBuildStatusPublishModeItems() {
-            return DescriptorHelper.doBuildStatusPublishModeItems();
-        }
-
-        @Restricted(NoExternalUse.class)
-        public ListBoxModel doFillOriginBuildStatusPublishModeItems() {
-            return DescriptorHelper.doBuildStatusPublishModeItems();
-        }
-
-        @Restricted(NoExternalUse.class)
-        public ListBoxModel doFillForkBuildStatusPublishModeItems() {
-            return DescriptorHelper.doBuildStatusPublishModeItems();
-        }
-
-        @Restricted(NoExternalUse.class)
-        public ListBoxModel doFillTagBuildStatusPublishModeItems() {
-            return DescriptorHelper.doBuildStatusPublishModeItems();
-        }
-
 
         @Restricted(NoExternalUse.class)
         public ListBoxModel doFillProjectSelectorIdItems() {

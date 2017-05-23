@@ -22,7 +22,7 @@ class SourceVisitor {
     }
 
     void visitSources() throws IOException, InterruptedException {
-        visitSources(navigator.getConnectionName(), ProjectQuery.create(navigator));
+        visitSources(navigator.getSourceSettings().getConnectionName(), ProjectQuery.create(navigator));
     }
 
     private void visitSources(String connectionName, ProjectQuery projectQuery) throws InterruptedException, IOException {
@@ -41,7 +41,7 @@ class SourceVisitor {
 
     void visitProject(String sourceName) throws IOException, InterruptedException {
         try {
-            GitLabProject project = gitLabAPI(navigator.getConnectionName()).getProject(sourceName);
+            GitLabProject project = gitLabAPI(navigator.getSourceSettings().getConnectionName()).getProject(sourceName);
             if (project != null) {
                 visitProject(project);
             }

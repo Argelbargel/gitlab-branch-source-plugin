@@ -22,7 +22,7 @@ public final class GitLabSCMTagPushEvent extends GitLabSCMPushEvent implements G
 
     @Override
     protected boolean isMatch(@Nonnull GitLabSCMSource source) {
-        return super.isMatch(source) && source.getMonitorTags();
+        return super.isMatch(source) && source.getSourceSettings().getTagMonitorStrategy().getMonitored();
     }
 
     @Override

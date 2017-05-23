@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:optionalBlock title="Monitor &amp; Build Merge Requests from Forks" field="monitored" inline="true"
+                     checked="${descriptor.defaults.monitored}">
+        <f:nested>
+            <table>
+                <f:optionalBlock title="${%Build merged with base branch}" field="build"
+                                 checked="${descriptor.defaults.build}" inline="true">
+                    <f:entry title="${%Build only mergeable requests}" field="buildOnlyMergeableMerged">
+                        <f:checkbox default="${descriptor.defaults.buildOnlyMergeableMerged}"/>
+                    </f:entry>
+                    <f:entry title="${%Accept merge-request when build succeeds}" field="acceptMergeRequests">
+                        <f:checkbox default="${descriptor.defaults.acceptMergeRequests}"/>
+                    </f:entry>
+                </f:optionalBlock>
+                <f:entry title="${%Build unmerged head}" field="buildUnmerged">
+                    <f:checkbox default="${descriptor.defaults.buildUnmerged}"/>
+                </f:entry>
+                <f:entry title="${%Ignore Work In Progress}" field="ignoreWorkInProgress">
+                    <f:checkbox default="${descriptor.defaults.ignoreWorkInProgress}"/>
+                </f:entry>
+                <f:entry title="${%Publish build status}" field="buildStatusPublishMode">
+                    <f:select default="${descriptor.defaults.buildStatusPublishMode}"/>
+                </f:entry>
+            </table>
+        </f:nested>
+    </f:optionalBlock>
+</j:jelly>
