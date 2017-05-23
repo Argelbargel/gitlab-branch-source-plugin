@@ -292,7 +292,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
             ListBoxModel items = new ListBoxModel();
             // TODO: respect settings in nearest GitLabSCMNavigator
             for (GitLabProject project : gitLabAPI(connectionName).findProjects(VISIBLE, ALL, "")) {
-                items.add(project.getNameWithNamespace());
+                items.add(project.getPathWithNamespace());
             }
             return items;
         }
