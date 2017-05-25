@@ -75,11 +75,11 @@ public final class GitLabSCMMergeRequestEvent extends GitLabSCMHeadEvent<MergeRe
                 createBranch(sourceProjectId, sourceBranch, hash),
                 createBranch(attributes.getTargetProjectId(), attributes.getTargetBranch(), REVISION_HEAD));
 
-        if (source.sourceSettings.buildUnmerged(head)) {
+        if (source.getSourceSettings().buildUnmerged(head)) {
             heads.add(head);
         }
 
-        if (source.sourceSettings.buildMerged(head)) {
+        if (source.getSourceSettings().buildMerged(head)) {
             heads.add(head.merged());
         }
 

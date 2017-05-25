@@ -54,7 +54,7 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject
 public class GitLabSCMSource extends AbstractGitSCMSource {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMSource.class.getName());
 
-    public final GitLabSCMSourceSettings sourceSettings;
+    private final GitLabSCMSourceSettings sourceSettings;
     private final GitLabProject project;
     private final GitLabSCMWebHookListener hookListener;
     private final SourceHeads heads;

@@ -4,6 +4,7 @@ package argelbargel.jenkins.plugins.gitlab_branch_source;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPI;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabMergeRequest;
+import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeRequestFilter;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMMergeRequestEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMPushEvent;
@@ -167,7 +168,7 @@ class SourceHeads {
     private void retrieveMergeRequests(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         branchesWithMergeRequestsCache = new HashMap<>();
 
-        if (source.getProject().isMergeRequestsEnabled() && (source.getSourceSettings().getOriginMonitorStrategy().getMonitored() || source.getSourceSettings().getForksMonitorStrategy().getMonitored())) {
+        if (shouldIncludeMergeRequests(source.getProject())) {
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequests());
 
             GitLabMergeRequestFilter filter = source.getSourceSettings().createMergeRequestFilter(listener);
@@ -179,6 +180,10 @@ class SourceHeads {
                 }
             }
         }
+    }
+
+    private boolean shouldIncludeMergeRequests(GitLabProject project) {
+        return project.isMergeRequestsEnabled() && (source.getSourceSettings().getOriginMonitorStrategy().getMonitored() || source.getSourceSettings().getForksMonitorStrategy().getMonitored());
     }
 
     private void retrieveBranches(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws InterruptedException, IOException {
@@ -235,11 +240,11 @@ class SourceHeads {
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
                 createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)), Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
 
-        if (source.sourceSettings.buildUnmerged(head)) {
+        if (source.getSourceSettings().buildUnmerged(head)) {
             observe(criteria, observer, head, listener);
         }
 
-        if (source.sourceSettings.buildMerged(head)) {
+        if (source.getSourceSettings().buildMerged(head)) {
             if (!head.isMergeable() && buildOnlyMergeableRequests(head)) {
                 log(listener, Messages.GitLabSCMSource_willNotBuildUnmergeableRequest(mergeRequest.getIid(), mergeRequest.getTargetBranch(), mergeRequest.getMergeStatus()));
             }
