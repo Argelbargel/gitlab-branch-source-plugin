@@ -185,6 +185,10 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
 
     }
 
+    boolean shouldMonitorMergeRequests() {
+        return getOriginMonitorStrategy().getMonitored() || getForksMonitorStrategy().getMonitored();
+    }
+
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     @Extension

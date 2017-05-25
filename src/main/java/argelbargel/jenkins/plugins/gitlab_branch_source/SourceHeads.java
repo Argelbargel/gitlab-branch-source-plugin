@@ -4,7 +4,6 @@ package argelbargel.jenkins.plugins.gitlab_branch_source;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPI;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabMergeRequest;
-import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeRequestFilter;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMMergeRequestEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMPushEvent;
@@ -168,7 +167,7 @@ class SourceHeads {
     private void retrieveMergeRequests(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         branchesWithMergeRequestsCache = new HashMap<>();
 
-        if (shouldIncludeMergeRequests(source.getProject(), source.getSourceSettings())) {
+        if (source.getProject().isMergeRequestsEnabled() && source.getSourceSettings().shouldMonitorMergeRequests()) {
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequests());
 
             GitLabMergeRequestFilter filter = source.getSourceSettings().createMergeRequestFilter(listener);
@@ -180,10 +179,6 @@ class SourceHeads {
                 }
             }
         }
-    }
-
-    private boolean shouldIncludeMergeRequests(GitLabProject project, GitLabSCMSourceSettings sourceSettings) {
-        return project.isMergeRequestsEnabled() && (sourceSettings.getOriginMonitorStrategy().getMonitored() || sourceSettings.getForksMonitorStrategy().getMonitored());
     }
 
     private void retrieveBranches(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws InterruptedException, IOException {
