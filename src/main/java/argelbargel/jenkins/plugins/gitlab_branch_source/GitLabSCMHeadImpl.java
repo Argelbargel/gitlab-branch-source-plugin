@@ -103,7 +103,7 @@ abstract class GitLabSCMHeadImpl extends GitLabSCMHead {
         }
 
         if (!projectCache.containsKey(projectId)) {
-            projectCache.put(projectId, gitLabAPI(source.getSourceSettings().getConnectionName()).getProject(projectId));
+            projectCache.put(projectId, gitLabAPI(source.getSourceSettings()).getProject(projectId));
         }
 
         return projectCache.get(projectId);
@@ -111,6 +111,6 @@ abstract class GitLabSCMHeadImpl extends GitLabSCMHead {
 
     // TODO: do we need this? Would prefer it to stay in GitLabSCMSource only
     private GitLab getBrowser(int projectId, @Nonnull GitLabSCMSource source) throws GitLabAPIException {
-        return new GitLab(getProject(projectId, source).getWebUrl(), source.getGitLabVersion());
+        return new GitLab(getProject(projectId, source).getWebUrl(), gitLabAPI(source.getSourceSettings()).getVersion());
     }
 }

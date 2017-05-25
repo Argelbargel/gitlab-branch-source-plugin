@@ -46,9 +46,9 @@ public final class GitLabAPI {
         this.delegate = delegate;
     }
 
-    public GitLabVersion getVersion() throws GitLabAPIException {
+    public String getVersion() throws GitLabAPIException {
         try {
-            return delegate.retrieve().to("/version", GitLabVersion.class);
+            return delegate.retrieve().to("/version", GitLabVersion.class).toString();
         } catch (IOException e) {
             throw new GitLabAPIException(e);
         }

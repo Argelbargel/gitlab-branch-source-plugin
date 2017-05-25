@@ -3,7 +3,6 @@ package argelbargel.jenkins.plugins.gitlab_branch_source;
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject;
-import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeRequestFilter;
 import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHook;
 import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHookListener;
 import hudson.Extension;
@@ -55,7 +54,7 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject
 public class GitLabSCMSource extends AbstractGitSCMSource {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMSource.class.getName());
 
-    private final GitLabSCMSourceSettings sourceSettings;
+    public final GitLabSCMSourceSettings sourceSettings;
     private final GitLabProject project;
     private final GitLabSCMWebHookListener hookListener;
     private final SourceHeads heads;
@@ -63,7 +62,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
 
     @DataBoundConstructor
     public GitLabSCMSource(@Nonnull GitLabSCMSourceSettings sourceSettings, String projectPath) throws GitLabAPIException {
-        this(sourceSettings, gitLabAPI(sourceSettings.getConnectionName()).getProject(projectPath));
+        this(sourceSettings, gitLabAPI(sourceSettings).getProject(projectPath));
     }
 
     GitLabSCMSource(@Nonnull GitLabSCMSourceSettings sourceSettings, GitLabProject project) {
@@ -138,30 +137,13 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
     @Override
     public GitRepositoryBrowser getBrowser() {
         try {
-            return new GitLab(project.getWebUrl(), getGitLabVersion());
+            return new GitLab(project.getWebUrl(), gitLabAPI(getSourceSettings()).getVersion());
         } catch (GitLabAPIException e) {
             LOGGER.warning("could not determine gitlab-version:" + e.getMessage());
             return super.getBrowser();
         }
     }
 
-    public boolean buildMerged(GitLabSCMMergeRequestHead head) {
-        return sourceSettings.determineMergeRequestStrategyValue(head, sourceSettings.getOriginMonitorStrategy().getBuild(), sourceSettings.getForksMonitorStrategy().getBuild());
-
-    }
-
-    public boolean buildUnmerged(GitLabSCMMergeRequestHead head) {
-        return sourceSettings.determineMergeRequestStrategyValue(head, sourceSettings.getOriginMonitorStrategy().getBuildUnmerged(), sourceSettings.getForksMonitorStrategy().getBuildUnmerged());
-    }
-
-    public String getMergeCommitMessage() {
-        return sourceSettings.getMergeCommitMessage();
-    }
-
-
-    final String getGitLabVersion() throws GitLabAPIException {
-        return gitLabAPI(getSourceSettings().getConnectionName()).getVersion().toString();
-    }
 
     @Override
     protected void retrieve(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @CheckForNull SCMHeadEvent<?> event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
@@ -228,10 +210,6 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         return true;
     }
 
-    String getDescription() {
-        return project.getDescription();
-    }
-
     @Nonnull
     @Override
     public SCM build(@Nonnull SCMHead head, @CheckForNull SCMRevision revision) {
@@ -250,23 +228,15 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         return scm;
     }
 
-    GitLabMergeRequestFilter createMergeRequestFilter(TaskListener listener) {
-        return sourceSettings.createMergeRequestFilter(listener);
-    }
-
-    boolean determineMergeRequestStrategyValue(GitLabSCMMergeRequestHead head, boolean originValue, boolean forksValue) {
-        return sourceSettings.determineMergeRequestStrategyValue(head, originValue, forksValue);
-    }
-
-    @Override
-    protected boolean isExcluded(String branchName) {
-        return super.isExcluded(branchName);
-    }
-
     @Nonnull
     @Override
     protected SCMProbe createProbe(@Nonnull SCMHead head, @CheckForNull SCMRevision revision) {
         return GitLabSCMProbe.create(this, head, revision);
+    }
+
+    @Override // overridden to allow access from SourceHeads
+    protected boolean isExcluded(String branchName) {
+        return super.isExcluded(branchName);
     }
 
 

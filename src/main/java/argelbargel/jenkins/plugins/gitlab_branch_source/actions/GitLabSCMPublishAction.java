@@ -2,12 +2,14 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.actions;
 
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode;
+import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSourceSettings;
 import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState;
 import hudson.model.InvisibleAction;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import jenkins.scm.api.SCMHead;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepEndNode;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
@@ -40,6 +42,7 @@ import static hudson.model.Result.UNSTABLE;
 import static java.util.logging.Level.SEVERE;
 
 
+// TODO: can/should be a RunAction
 public final class GitLabSCMPublishAction extends InvisibleAction implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMPublishAction.class.getName());
 
@@ -48,7 +51,11 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
     private final boolean updateBuildDescription;
     private final BuildStatusPublishMode mode;
 
-    public GitLabSCMPublishAction(String connectionName, boolean updateBuildDescription, BuildStatusPublishMode mode, boolean markUnstableAsSuccess) {
+    public GitLabSCMPublishAction(SCMHead head, GitLabSCMSourceSettings settings) {
+        this(settings.getConnectionName(), settings.getUpdateBuildDescription(), settings.determineBuildStatusPublishMode(head), settings.getPublishUnstableBuildsAsSuccess());
+    }
+
+    private GitLabSCMPublishAction(String connectionName, boolean updateBuildDescription, BuildStatusPublishMode mode, boolean markUnstableAsSuccess) {
         this.connectionName = connectionName;
         this.markUnstableAsSuccess = markUnstableAsSuccess;
         this.updateBuildDescription = updateBuildDescription;

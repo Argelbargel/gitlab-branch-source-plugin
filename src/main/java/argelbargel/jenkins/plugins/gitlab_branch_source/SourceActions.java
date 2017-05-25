@@ -64,12 +64,7 @@ class SourceActions {
     private List<Action> retrieve(@Nonnull GitLabSCMHead head, @CheckForNull SCMHeadEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         List<Action> actions = new ArrayList<>();
 
-        actions.add(new GitLabSCMPublishAction(
-                source.getSourceSettings().getConnectionName(),
-                source.getSourceSettings().getUpdateBuildDescription(),
-                buildStatusPublishMode(head),
-                source.getSourceSettings().getPublishUnstableBuildsAsSuccess()
-        ));
+        actions.add(new GitLabSCMPublishAction(head, source.getSourceSettings()));
 
         Action linkAction;
 
@@ -78,7 +73,7 @@ class SourceActions {
             linkAction = GitLabLinkAction.toMergeRequest(mr.getWebUrl());
             if (acceptMergeRequest(head)) {
                 boolean removeSourceBranch = mr.getRemoveSourceBranch() || removeSourceBranch(head);
-                actions.add(new GitLabSCMAcceptMergeRequestAction(mr.getProjectId(), mr.getId(), mr.getIid(), source.getMergeCommitMessage(), removeSourceBranch));
+                actions.add(new GitLabSCMAcceptMergeRequestAction(mr.getProjectId(), mr.getId(), mr.getIid(), source.getSourceSettings().getMergeCommitMessage(), removeSourceBranch));
             }
         } else {
             linkAction = (head instanceof TagSCMHead) ? GitLabLinkAction.toTag(source.getProject(), head.getName()) : GitLabLinkAction.toBranch(source.getProject(), head.getName());
@@ -129,26 +124,14 @@ class SourceActions {
 
     private GitLabMergeRequest retrieveMergeRequest(@Nonnull ChangeRequestSCMHead head, @Nonnull TaskListener listener) throws GitLabAPIException {
         listener.getLogger().format(Messages.GitLabSCMSource_retrievingMergeRequest(head.getId()) + "\n");
-        return gitLabAPI(source.getSourceSettings().getConnectionName()).getMergeRequest(source.getProjectId(), head.getId());
-    }
-
-    private BuildStatusPublishMode buildStatusPublishMode(SCMHead head) {
-        if (head instanceof GitLabSCMMergeRequestHead) {
-            return ((GitLabSCMMergeRequestHead) head).fromOrigin()
-                    ? source.getSourceSettings().getOriginMonitorStrategy().getBuildStatusPublishMode()
-                    : source.getSourceSettings().getForksMonitorStrategy().getBuildStatusPublishMode();
-        } else if (head instanceof TagSCMHead) {
-            return source.getSourceSettings().getTagMonitorStrategy().getBuildStatusPublishMode();
-        }
-
-        return source.getSourceSettings().getBranchMonitorStrategy().getBuildStatusPublishMode();
+        return gitLabAPI(source.getSourceSettings()).getMergeRequest(source.getProjectId(), head.getId());
     }
 
     private boolean acceptMergeRequest(SCMHead head) {
         if (head instanceof GitLabSCMMergeRequestHead) {
             GitLabSCMMergeRequestHead mergeRequest = (GitLabSCMMergeRequestHead) head;
             return mergeRequest.isMerged() &&
-                    source.determineMergeRequestStrategyValue(
+                    source.getSourceSettings().determineMergeRequestStrategyValue(
                             mergeRequest,
                             source.getSourceSettings().getOriginMonitorStrategy().getAcceptMergeRequests(),
                             source.getSourceSettings().getForksMonitorStrategy().getAcceptMergeRequests());

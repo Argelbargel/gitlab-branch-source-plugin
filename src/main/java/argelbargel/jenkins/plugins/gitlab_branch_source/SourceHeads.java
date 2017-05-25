@@ -170,7 +170,7 @@ class SourceHeads {
         if (source.getProject().isMergeRequestsEnabled() && (source.getSourceSettings().getOriginMonitorStrategy().getMonitored() || source.getSourceSettings().getForksMonitorStrategy().getMonitored())) {
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequests());
 
-            GitLabMergeRequestFilter filter = source.createMergeRequestFilter(listener);
+            GitLabMergeRequestFilter filter = source.getSourceSettings().createMergeRequestFilter(listener);
             for (GitLabMergeRequest mr : filter.filter(api().getMergeRequests(source.getProjectId()))) {
                 checkInterrupt();
 
@@ -235,11 +235,11 @@ class SourceHeads {
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
                 createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)), Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
 
-        if (source.buildUnmerged(head)) {
+        if (source.sourceSettings.buildUnmerged(head)) {
             observe(criteria, observer, head, listener);
         }
 
-        if (source.buildMerged(head)) {
+        if (source.sourceSettings.buildMerged(head)) {
             if (!head.isMergeable() && buildOnlyMergeableRequests(head)) {
                 log(listener, Messages.GitLabSCMSource_willNotBuildUnmergeableRequest(mergeRequest.getIid(), mergeRequest.getTargetBranch(), mergeRequest.getMergeStatus()));
             }
@@ -274,7 +274,7 @@ class SourceHeads {
     }
 
     private GitLabAPI api() throws GitLabAPIException {
-        return gitLabAPI(source.getSourceSettings().getConnectionName());
+        return gitLabAPI(source.getSourceSettings());
     }
 
     private void log(@Nonnull TaskListener listener, String message) {
@@ -296,7 +296,7 @@ class SourceHeads {
     @SuppressWarnings("SimplifiableIfStatement")
     private boolean buildOnlyMergeableRequests(SCMHead head) {
         if (head instanceof GitLabSCMMergeRequestHead) {
-            return source.determineMergeRequestStrategyValue(
+            return source.getSourceSettings().determineMergeRequestStrategyValue(
                     ((GitLabSCMMergeRequestHead) head),
                     source.getSourceSettings().getOriginMonitorStrategy().getBuildOnlyMergeableMerged(),
                     source.getSourceSettings().getForksMonitorStrategy().getBuildOnlyMergeableMerged());

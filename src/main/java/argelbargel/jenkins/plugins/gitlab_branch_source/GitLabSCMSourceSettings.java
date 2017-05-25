@@ -20,7 +20,9 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
+import jenkins.scm.api.SCMHead;
 import jenkins.scm.api.SCMSourceOwner;
+import jenkins.scm.api.mixin.TagSCMHead;
 import org.jenkinsci.plugins.gitclient.GitClient;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -159,6 +161,28 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
     boolean determineMergeRequestStrategyValue(GitLabSCMMergeRequestHead head, boolean originStrategy, boolean forksStrategy) {
         boolean fromOrigin = head.fromOrigin();
         return (fromOrigin && originStrategy) || (!fromOrigin && forksStrategy);
+    }
+
+    @Restricted(NoExternalUse.class)
+    public BuildStatusPublishMode determineBuildStatusPublishMode(SCMHead head) {
+        if (head instanceof GitLabSCMMergeRequestHead) {
+            return ((GitLabSCMMergeRequestHead) head).fromOrigin()
+                    ? originMonitorStrategy.getBuildStatusPublishMode()
+                    : forksMonitorStrategy.getBuildStatusPublishMode();
+        } else if (head instanceof TagSCMHead) {
+            return tagMonitorStrategy.getBuildStatusPublishMode();
+        }
+
+        return branchMonitorStrategy.getBuildStatusPublishMode();
+    }
+
+    public boolean buildUnmerged(GitLabSCMMergeRequestHead head) {
+        return determineMergeRequestStrategyValue(head, originMonitorStrategy.getBuildUnmerged(), forksMonitorStrategy.getBuildUnmerged());
+    }
+
+    public boolean buildMerged(GitLabSCMMergeRequestHead head) {
+        return determineMergeRequestStrategyValue(head, originMonitorStrategy.getBuild(), forksMonitorStrategy.getBuild());
+
     }
 
 

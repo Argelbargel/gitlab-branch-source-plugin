@@ -24,6 +24,11 @@ import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCreden
 public final class GitLabHelper {
     private GitLabHelper() { /* no instances allowed */ }
 
+
+    public static GitLabAPI gitLabAPI(GitLabSCMSourceSettings settings) throws GitLabAPIException {
+        return gitLabAPI(settings.getConnectionName());
+    }
+
     public static GitLabAPI gitLabAPI(String connectionName) throws GitLabAPIException {
         GitLabConnection connection = gitLabConnection(connectionName);
         return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()));
