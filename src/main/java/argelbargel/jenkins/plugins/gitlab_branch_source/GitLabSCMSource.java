@@ -54,24 +54,28 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject
 public class GitLabSCMSource extends AbstractGitSCMSource {
     private static final Logger LOGGER = Logger.getLogger(GitLabSCMSource.class.getName());
 
-    private final GitLabSCMSourceSettings sourceSettings;
     private final GitLabProject project;
+    private final GitLabSCMSourceSettings sourceSettings;
     private final GitLabSCMWebHookListener hookListener;
     private final SourceHeads heads;
     private final SourceActions actions;
 
     @DataBoundConstructor
-    public GitLabSCMSource(@Nonnull GitLabSCMSourceSettings sourceSettings, String projectPath) throws GitLabAPIException {
-        this(sourceSettings, gitLabAPI(sourceSettings).getProject(projectPath));
+    public GitLabSCMSource(@Nonnull String projectPath, @Nonnull GitLabSCMSourceSettings sourceSettings) throws GitLabAPIException {
+        this(gitLabAPI(sourceSettings).getProject(projectPath), sourceSettings);
     }
 
-    GitLabSCMSource(@Nonnull GitLabSCMSourceSettings sourceSettings, GitLabProject project) {
+    GitLabSCMSource(GitLabProject project, GitLabSCMSourceSettings sourceSettings) {
         super(null);
-        this.sourceSettings = sourceSettings;
         this.project = project;
+        this.sourceSettings = sourceSettings;
         this.hookListener = GitLabSCMWebHook.createListener(this);
         this.actions = new SourceActions(this);
         this.heads = new SourceHeads(this);
+    }
+
+    GitLabProject getProject() {
+        return project;
     }
 
     public GitLabSCMSourceSettings getSourceSettings() {
@@ -96,10 +100,6 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
     @Override
     public String getExcludes() {
         return sourceSettings.getBranchMonitorStrategy().getExcludes();
-    }
-
-    GitLabProject getProject() {
-        return project;
     }
 
     public int getProjectId() {

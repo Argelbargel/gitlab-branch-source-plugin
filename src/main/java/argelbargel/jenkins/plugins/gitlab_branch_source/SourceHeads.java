@@ -168,7 +168,7 @@ class SourceHeads {
     private void retrieveMergeRequests(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         branchesWithMergeRequestsCache = new HashMap<>();
 
-        if (shouldIncludeMergeRequests(source.getProject())) {
+        if (shouldIncludeMergeRequests(source.getProject(), source.getSourceSettings())) {
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequests());
 
             GitLabMergeRequestFilter filter = source.getSourceSettings().createMergeRequestFilter(listener);
@@ -182,8 +182,8 @@ class SourceHeads {
         }
     }
 
-    private boolean shouldIncludeMergeRequests(GitLabProject project) {
-        return project.isMergeRequestsEnabled() && (source.getSourceSettings().getOriginMonitorStrategy().getMonitored() || source.getSourceSettings().getForksMonitorStrategy().getMonitored());
+    private boolean shouldIncludeMergeRequests(GitLabProject project, GitLabSCMSourceSettings sourceSettings) {
+        return project.isMergeRequestsEnabled() && (sourceSettings.getOriginMonitorStrategy().getMonitored() || sourceSettings.getForksMonitorStrategy().getMonitored());
     }
 
     private void retrieveBranches(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull TaskListener listener) throws InterruptedException, IOException {
