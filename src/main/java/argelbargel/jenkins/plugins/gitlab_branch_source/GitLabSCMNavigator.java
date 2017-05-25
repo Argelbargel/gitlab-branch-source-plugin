@@ -64,10 +64,6 @@ public class GitLabSCMNavigator extends SCMNavigator {
         return sourceSettings;
     }
 
-    public GitLabSCMWebHookSettings getWebhookSettings() {
-        return new GitLabSCMWebHookSettings();
-    }
-
     public String getProjectGroup() {
         return (projectGroup != null) ? projectGroup : "";
     }
@@ -108,6 +104,22 @@ public class GitLabSCMNavigator extends SCMNavigator {
         return hookListener.url().toString();
     }
 
+    public boolean getListenToWebHooks() {
+        return hookListener.getListen();
+    }
+
+    public void setListenToWebHooks(boolean value) {
+        hookListener.setListen(value);
+    }
+
+    public boolean getRegisterWebHooks() {
+        return hookListener.getRegister();
+    }
+
+    public void setRegisterWebHooks(boolean value) {
+        hookListener.setRegister(value);
+    }
+
     @Nonnull
     @Override
     protected List<Action> retrieveActions(@Nonnull SCMNavigatorOwner owner, @CheckForNull SCMNavigatorEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
@@ -128,7 +140,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
 
     @Override
     public void afterSave(@Nonnull SCMNavigatorOwner owner) {
-        if (getWebhookSettings().getListenToWebHooks()) {
+        if (getListenToWebHooks()) {
             LOGGER.info("registering listener for " + owner.getFullName() + "...");
             GitLabSCMWebHook.get().addListener(this, owner);
             saved = true;

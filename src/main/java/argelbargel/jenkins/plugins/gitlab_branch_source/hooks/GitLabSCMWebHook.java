@@ -55,7 +55,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
     }
 
     public void addListener(GitLabSCMNavigator navigator, Item owner) {
-        manager.addListener(navigator.getHookListener(), owner, navigator.getWebhookSettings().getRegisterWebHooks());
+        manager.addListener(navigator.getHookListener(), owner, navigator.getRegisterWebHooks());
     }
 
     public void addListener(GitLabSCMSource source, Item owner) {
@@ -63,7 +63,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
     }
 
     public void removeListener(GitLabSCMNavigator navigator, Item owner) {
-        manager.removeListener(navigator.getHookListener(), owner, navigator.getWebhookSettings().getRegisterWebHooks());
+        manager.removeListener(navigator.getHookListener(), owner, navigator.getRegisterWebHooks());
     }
 
     public void removeListener(GitLabSCMSource source, Item owner) {
@@ -154,7 +154,7 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
         }
 
         private void handle(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
-            if (navigator.getWebhookSettings().getListenToWebHooks() && !StringUtils.isEmpty(navigator.getSourceSettings().getConnectionName())) {
+            if (navigator.getListenToWebHooks() && !StringUtils.isEmpty(navigator.getSourceSettings().getConnectionName())) {
                 addListener(navigator, owner);
             }
         }

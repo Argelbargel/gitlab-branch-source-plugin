@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:property field="sourceSettings"/>
     <f:section title="Project Selection">
         <f:block>
             <table style="width: 100%">
@@ -21,5 +22,25 @@
             </table>
         </f:block>
     </f:section>
-    <f:property field="sourceSettings"/>
+    <f:section title="Webhooks">
+        <f:block>
+            <table style="width: 100%">
+                <f:optionalBlock title="${%Build when a change is pushed to GitLab}" field="listenToWebHooks"
+                                 checked="true" inline="true">
+                    <f:advanced>
+                        <f:optionalBlock title="${%Auto-Register Webhook}" field="registerWebHooks" checked="true"
+                                         negative="true"
+                                         inline="true">
+                            <f:entry title="${%Register system-hook manually}:">
+                                <f:readOnlyTextbox field="hookUrl"
+                                                   default="Currently you have to check back here after the project was saved to get the project-hook-url to register manually"/>
+                                <br/>
+                                (<strong>Push Events:</strong> false)
+                            </f:entry>
+                        </f:optionalBlock>
+                    </f:advanced>
+                </f:optionalBlock>
+            </table>
+        </f:block>
+    </f:section>
 </j:jelly>
