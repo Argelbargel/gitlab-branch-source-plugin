@@ -142,9 +142,10 @@ public class GitLabSCMNavigator extends SCMNavigator {
     @Override
     public void afterSave(@Nonnull SCMNavigatorOwner owner) {
         if (getListenToWebHooks()) {
-            LOGGER.info("registering listener for " + owner.getFullName() + "...");
             GitLabSCMWebHook.get().addListener(this, owner);
             saved = true;
+        } else {
+            GitLabSCMWebHook.get().removeListener(this, owner);
         }
     }
 

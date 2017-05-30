@@ -40,6 +40,7 @@ class HookManager {
             managedListeners.put(listener.id(), new ListenerState());
         }
 
+        LOGGER.info("acquiring listener for " + owner.getFullName() + "...");
         managedListeners.get(listener.id()).acquire(owner);
     }
 
@@ -69,6 +70,7 @@ class HookManager {
     private void removeListener(GitLabSCMWebHookListener listener, Item owner) {
         ListenerState managed = managedListeners.get(listener.id());
         if (managed != null) {
+            LOGGER.info("releasing listener for " + owner.getFullName() + "...");
             managed.release(owner);
             if (!managed.hasUsages()) {
                 unregisterAndDestroy(listener, managed);

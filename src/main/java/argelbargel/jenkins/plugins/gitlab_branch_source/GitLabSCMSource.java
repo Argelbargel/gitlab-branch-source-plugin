@@ -146,6 +146,14 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         }
     }
 
+    @Override
+    public void afterSave() {
+        if (getListenToWebHooks()) {
+            GitLabSCMWebHook.get().addListener(this, getOwner());
+        } else {
+            GitLabSCMWebHook.get().removeListener(this, getOwner());
+        }
+    }
 
     @Override
     protected void retrieve(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @CheckForNull SCMHeadEvent<?> event, @Nonnull TaskListener listener) throws IOException, InterruptedException {

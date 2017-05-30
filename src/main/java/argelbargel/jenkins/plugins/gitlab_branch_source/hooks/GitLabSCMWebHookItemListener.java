@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 
 @Extension
 public final class GitLabSCMWebHookItemListener extends ItemListener {
+    // TODO: check whether we really need this
     @Override
     public void onCreated(Item item) {
         if (item instanceof SCMSourceOwner) {
@@ -22,6 +23,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         }
     }
 
+    // TODO: check whether we really need this
     private void onCreated(SCMSourceOwner item) {
         for (SCMSource source : item.getSCMSources()) {
             if (source instanceof GitLabSCMSource) {
@@ -57,6 +59,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         }
     }
 
+    // TODO: check whether we really need this
     @Override
     public void onUpdated(Item item) {
         if (item instanceof SCMNavigatorOwner) {
@@ -64,6 +67,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         }
     }
 
+    // TODO: check whether we really need this
     private void onUpdated(SCMNavigatorOwner owner) {
         for (SCMNavigator navigator : owner.getSCMNavigators()) {
             if (navigator instanceof GitLabSCMNavigator) {
@@ -72,6 +76,7 @@ public final class GitLabSCMWebHookItemListener extends ItemListener {
         }
     }
 
+    // TODO: check whether we really need this
     private void onUpdated(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
         if (navigator.saved()) {
             if (navigator.getListenToWebHooks()) {
