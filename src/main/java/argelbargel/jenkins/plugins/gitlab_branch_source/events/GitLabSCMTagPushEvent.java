@@ -1,13 +1,14 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.events;
 
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead;
+
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.PushHook;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.createTag;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createTag;
 import static java.util.Collections.singletonList;
 import static jenkins.scm.api.SCMEvent.Type.CREATED;
 import static jenkins.scm.api.SCMEvent.Type.REMOVED;

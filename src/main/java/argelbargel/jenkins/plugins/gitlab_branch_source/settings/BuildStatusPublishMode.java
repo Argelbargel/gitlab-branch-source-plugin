@@ -1,4 +1,4 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.settings;
 
 
 public enum BuildStatusPublishMode {

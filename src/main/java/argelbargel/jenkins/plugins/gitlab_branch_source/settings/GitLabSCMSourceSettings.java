@@ -1,14 +1,13 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.settings;
 
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.AllowMergeRequestsFromForks;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.AllowMergeRequestsFromOrigin;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.FilterWorkInProgress;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeRequestFilter;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequestHead;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -32,13 +31,11 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import javax.annotation.Nonnull;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Logger;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.defaultGitLabConnectionName;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabConnection;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabConnectionNames;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.SettingsUtils.CHECKOUT_CREDENTIALS_ANONYMOUS;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.SettingsUtils.DEFAULT_MERGE_COMMIT_MESSAGE;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.SettingsUtils.defaultGitLabConnectionName;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.SettingsUtils.gitLabConnectionNames;
 
 
 public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLabSCMSourceSettings> {
@@ -52,7 +49,8 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
     private boolean publishUnstableBuildsAsSuccess;
     private String mergeCommitMessage;
 
-    GitLabSCMSourceSettings() {
+
+    public GitLabSCMSourceSettings() {
         this(defaultGitLabConnectionName(),
                 new GitLabSCMBranchMonitorStrategy(),
                 new GitLabSCMOriginMonitorStrategy(),
@@ -60,6 +58,7 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
                 new GitLabSCMTagMonitorStrategy());
     }
 
+    @SuppressWarnings("WeakerAccess")
     @DataBoundConstructor
     public GitLabSCMSourceSettings(String connectionName,
                                    GitLabSCMBranchMonitorStrategy branchMonitorStrategy,
@@ -71,10 +70,10 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         this.originMonitorStrategy = originMonitorStrategy;
         this.forksMonitorStrategy = forksMonitorStrategy;
         this.tagMonitorStrategy = tagMonitorStrategy;
-        this.credentialsId = DescriptorImpl.CHECKOUT_CREDENTIALS_ANONYMOUS;
+        this.credentialsId = CHECKOUT_CREDENTIALS_ANONYMOUS;
         this.updateBuildDescription = true;
         this.publishUnstableBuildsAsSuccess = false;
-        this.mergeCommitMessage = DescriptorImpl.DEFAULT_MERGE_COMMIT_MESSAGE;
+        this.mergeCommitMessage = DEFAULT_MERGE_COMMIT_MESSAGE;
     }
 
     @Nonnull
@@ -99,7 +98,7 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
     }
 
     public String getCredentialsId() {
-        return !DescriptorImpl.CHECKOUT_CREDENTIALS_ANONYMOUS.equals(credentialsId) ? credentialsId : null;
+        return !CHECKOUT_CREDENTIALS_ANONYMOUS.equals(credentialsId) ? credentialsId : null;
     }
 
     @DataBoundSetter
@@ -135,7 +134,32 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         this.mergeCommitMessage = value;
     }
 
-    GitLabMergeRequestFilter createMergeRequestFilter(TaskListener listener) {
+    @Restricted(NoExternalUse.class)
+    public boolean buildUnmerged(GitLabSCMMergeRequestHead head) {
+        return determineMergeRequestStrategyValue(head, originMonitorStrategy.getBuildUnmerged(), forksMonitorStrategy.getBuildUnmerged());
+    }
+
+    @Restricted(NoExternalUse.class)
+    public boolean buildMerged(GitLabSCMMergeRequestHead head) {
+        return determineMergeRequestStrategyValue(head, originMonitorStrategy.getBuild(), forksMonitorStrategy.getBuild());
+
+    }
+
+    @Restricted(NoExternalUse.class)
+    public BuildStatusPublishMode determineBuildStatusPublishMode(SCMHead head) {
+        if (head instanceof GitLabSCMMergeRequestHead) {
+            return ((GitLabSCMMergeRequestHead) head).fromOrigin()
+                    ? originMonitorStrategy.getBuildStatusPublishMode()
+                    : forksMonitorStrategy.getBuildStatusPublishMode();
+        } else if (head instanceof TagSCMHead) {
+            return tagMonitorStrategy.getBuildStatusPublishMode();
+        }
+
+        return branchMonitorStrategy.getBuildStatusPublishMode();
+    }
+
+
+    public GitLabMergeRequestFilter createMergeRequestFilter(TaskListener listener) {
         GitLabMergeRequestFilter filter = GitLabMergeRequestFilter.ALLOW_NONE;
         if (originMonitorStrategy.getMonitored()) {
             GitLabMergeRequestFilter originFilter = new AllowMergeRequestsFromOrigin(listener);
@@ -158,45 +182,20 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         return filter;
     }
 
-    boolean determineMergeRequestStrategyValue(GitLabSCMMergeRequestHead head, boolean originStrategy, boolean forksStrategy) {
+    public boolean shouldMonitorMergeRequests() {
+        return getOriginMonitorStrategy().getMonitored() || getForksMonitorStrategy().getMonitored();
+    }
+
+
+    public boolean determineMergeRequestStrategyValue(GitLabSCMMergeRequestHead head, boolean originStrategy, boolean forksStrategy) {
         boolean fromOrigin = head.fromOrigin();
         return (fromOrigin && originStrategy) || (!fromOrigin && forksStrategy);
-    }
-
-    @Restricted(NoExternalUse.class)
-    public BuildStatusPublishMode determineBuildStatusPublishMode(SCMHead head) {
-        if (head instanceof GitLabSCMMergeRequestHead) {
-            return ((GitLabSCMMergeRequestHead) head).fromOrigin()
-                    ? originMonitorStrategy.getBuildStatusPublishMode()
-                    : forksMonitorStrategy.getBuildStatusPublishMode();
-        } else if (head instanceof TagSCMHead) {
-            return tagMonitorStrategy.getBuildStatusPublishMode();
-        }
-
-        return branchMonitorStrategy.getBuildStatusPublishMode();
-    }
-
-    public boolean buildUnmerged(GitLabSCMMergeRequestHead head) {
-        return determineMergeRequestStrategyValue(head, originMonitorStrategy.getBuildUnmerged(), forksMonitorStrategy.getBuildUnmerged());
-    }
-
-    public boolean buildMerged(GitLabSCMMergeRequestHead head) {
-        return determineMergeRequestStrategyValue(head, originMonitorStrategy.getBuild(), forksMonitorStrategy.getBuild());
-
-    }
-
-    boolean shouldMonitorMergeRequests() {
-        return getOriginMonitorStrategy().getMonitored() || getForksMonitorStrategy().getMonitored();
     }
 
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     @Extension
     public static class DescriptorImpl extends Descriptor<GitLabSCMSourceSettings> {
-        public static final String CHECKOUT_CREDENTIALS_ANONYMOUS = "ANONYMOUS";
-        public static final String DEFAULT_MERGE_COMMIT_MESSAGE = "Accepted Merge-Request #{0} after build {1} succeeded";
-        private static final Logger LOGGER = Logger.getLogger(DescriptorImpl.class.getName());
-
         public GitLabSCMSourceSettings getDefaults() {
             return new GitLabSCMSourceSettings();
         }
@@ -230,22 +229,9 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
                             : ACL.SYSTEM,
                     context,
                     StandardUsernameCredentials.class,
-                    gitLabConnectionRequirements(connectionName),
+                    SettingsUtils.gitLabConnectionRequirements(connectionName),
                     GitClient.CREDENTIALS_MATCHER
             );
-        }
-
-        private static List<DomainRequirement> gitLabConnectionRequirements(String connectioName) {
-            URIRequirementBuilder builder = URIRequirementBuilder.create();
-
-            try {
-                URL connectionURL = new URL(gitLabConnection(connectioName).getUrl());
-                builder.withHostnamePort(connectionURL.getHost(), connectionURL.getPort());
-            } catch (Exception ignored) {
-                LOGGER.fine("ignoring invalid gitlab-connection: " + connectioName);
-            }
-
-            return builder.build();
         }
 
     }

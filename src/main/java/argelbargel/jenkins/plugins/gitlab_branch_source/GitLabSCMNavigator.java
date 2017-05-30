@@ -6,6 +6,7 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectSelecto
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectVisibility;
 import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHook;
 import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHookListener;
+import argelbargel.jenkins.plugins.gitlab_branch_source.settings.GitLabSCMSourceSettings;
 import hudson.Extension;
 import hudson.model.Action;
 import hudson.model.TaskListener;

@@ -1,11 +1,12 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.heads;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import jenkins.scm.api.mixin.TagSCMHead;
 
 import javax.annotation.Nonnull;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.TAGS;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.TAGS;
 
 public final class GitLabSCMTagHead extends GitLabSCMHeadImpl implements TagSCMHead {
     private final long timestamp;

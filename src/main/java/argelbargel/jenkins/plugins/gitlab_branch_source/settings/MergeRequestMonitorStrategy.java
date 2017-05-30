@@ -1,4 +1,4 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.settings;
 
 
 import org.kohsuke.stapler.DataBoundSetter;
@@ -10,7 +10,7 @@ public class MergeRequestMonitorStrategy extends MonitorStrategy {
     private boolean onlyMergeable;
     private boolean acceptMergeRequests;
 
-    protected MergeRequestMonitorStrategy(boolean monitor, boolean buildUnmerged, BuildStatusPublishMode buildStatusPublishMode) {
+    MergeRequestMonitorStrategy(boolean monitor, boolean buildUnmerged, BuildStatusPublishMode buildStatusPublishMode) {
         super(monitor, buildUnmerged, buildStatusPublishMode);
         this.ignoreWorkInProgress = true;
         this.onlyMergeable = false;

@@ -1,6 +1,7 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.heads;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject;
 import hudson.plugins.git.BranchSpec;
@@ -68,7 +69,7 @@ abstract class GitLabSCMHeadImpl extends GitLabSCMHead {
     }
 
     @Nonnull
-    final GitSCM createSCM(GitLabSCMSource source) {
+    public final GitSCM createSCM(GitLabSCMSource source) {
         try {
             return new GitSCM(getRemotes(source), getBranchSpecs(),
                     false, Collections.<SubmoduleConfig>emptyList(),

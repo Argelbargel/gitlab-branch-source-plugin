@@ -8,6 +8,9 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeR
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMMergeRequestEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMPushEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMTagPushEvent;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequestHead;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMTagHead;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestObjectAttributes;
 import hudson.model.TaskListener;
 import jenkins.plugins.git.AbstractGitSCMSource.SCMRevisionImpl;
@@ -28,12 +31,11 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabAPI;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.createBranch;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.createMergeRequest;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.createTag;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMMergeRequestHead.CAN_BE_MERGED;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.BRANCHES;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.TAGS;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createBranch;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createMergeRequest;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createTag;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.BRANCHES;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.TAGS;
 import static hudson.model.TaskListener.NULL;
 import static java.util.Collections.emptyMap;
 
@@ -49,6 +51,8 @@ class SourceHeads {
             return true;
         }
     };
+    private static final String CAN_BE_MERGED = "can_be_merged";
+
 
     private final GitLabSCMSource source;
     private transient Map<Integer, String> branchesWithMergeRequestsCache;

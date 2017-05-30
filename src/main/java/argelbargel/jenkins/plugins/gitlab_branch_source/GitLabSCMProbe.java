@@ -3,6 +3,8 @@ package argelbargel.jenkins.plugins.gitlab_branch_source;
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPI;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequestHead;
 import jenkins.plugins.git.AbstractGitSCMSource.SCMRevisionImpl;
 import jenkins.scm.api.SCMFile;
 import jenkins.scm.api.SCMHead;
@@ -18,7 +20,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabAPI;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.REVISION_HEAD;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.REVISION_HEAD;
 import static java.util.logging.Level.SEVERE;
 
 

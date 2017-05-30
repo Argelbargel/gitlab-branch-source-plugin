@@ -1,6 +1,7 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.settings;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import hudson.Extension;
 import hudson.util.FormValidation;
 import org.kohsuke.accmod.Restricted;
@@ -9,7 +10,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode.stages;
+import javax.annotation.Nonnull;
 
 
 public final class GitLabSCMBranchMonitorStrategy extends MonitorStrategy {
@@ -26,7 +27,7 @@ public final class GitLabSCMBranchMonitorStrategy extends MonitorStrategy {
     }
 
     GitLabSCMBranchMonitorStrategy() {
-        this(true, stages);
+        this(true, BuildStatusPublishMode.stages);
     }
 
     public String getIncludes() {
@@ -63,6 +64,7 @@ public final class GitLabSCMBranchMonitorStrategy extends MonitorStrategy {
         public static final String DEFAULT_INCLUDES = "*";
         public static final String DEFAULT_EXCLUDES = "";
 
+        @Nonnull
         @Override
         public GitLabSCMBranchMonitorStrategy getDefaults() {
             return new GitLabSCMBranchMonitorStrategy();

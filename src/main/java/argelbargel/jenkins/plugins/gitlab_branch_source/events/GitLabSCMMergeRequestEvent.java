@@ -1,9 +1,9 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.events;
 
 
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead;
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMMergeRequestHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequestHead;
 import com.dabsquared.gitlabjenkins.cause.CauseData;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestHook;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestObjectAttributes;
@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.REVISION_HEAD;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.createBranch;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead.createMergeRequest;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.events.CauseDataHelper.buildCauseData;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.REVISION_HEAD;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createBranch;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createMergeRequest;
 import static jenkins.scm.api.SCMEvent.Type.CREATED;
 import static jenkins.scm.api.SCMEvent.Type.REMOVED;
 import static jenkins.scm.api.SCMEvent.Type.UPDATED;

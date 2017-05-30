@@ -1,9 +1,9 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.actions;
 
 
-import argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode;
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSourceSettings;
 import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
+import argelbargel.jenkins.plugins.gitlab_branch_source.settings.BuildStatusPublishMode;
+import argelbargel.jenkins.plugins.gitlab_branch_source.settings.GitLabSCMSourceSettings;
 import com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState;
 import hudson.model.InvisibleAction;
 import hudson.model.Result;
@@ -30,8 +30,8 @@ import java.util.Stack;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode.result;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode.stages;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.BuildStatusPublishMode.result;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.BuildStatusPublishMode.stages;
 import static com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState.canceled;
 import static com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState.failed;
 import static com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState.running;

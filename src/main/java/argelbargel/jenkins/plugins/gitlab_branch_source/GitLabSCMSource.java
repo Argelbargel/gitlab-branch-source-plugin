@@ -3,8 +3,10 @@ package argelbargel.jenkins.plugins.gitlab_branch_source;
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHook;
 import argelbargel.jenkins.plugins.gitlab_branch_source.hooks.GitLabSCMWebHookListener;
+import argelbargel.jenkins.plugins.gitlab_branch_source.settings.GitLabSCMSourceSettings;
 import hudson.Extension;
 import hudson.RelativePath;
 import hudson.model.Action;
@@ -43,11 +45,11 @@ import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitLabAPI;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMIcons.ICON_GITLAB;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.BRANCHES;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.MERGE_REQUESTS;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.TAGS;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectSelector.VISIBLE;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectVisibility.ALL;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.BRANCHES;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.MERGE_REQUESTS;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.TAGS;
 
 
 @SuppressWarnings({"unused", "WeakerAccess"})

@@ -1,4 +1,4 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.settings;
 
 
 import hudson.Extension;
@@ -7,12 +7,13 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.BuildStatusPublishMode.stages;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.settings.BuildStatusPublishMode.stages;
 
 
 public final class GitLabSCMOriginMonitorStrategy extends MergeRequestMonitorStrategy {
     private boolean removeSourceBranch;
 
+    @SuppressWarnings("WeakerAccess")
     @DataBoundConstructor
     public GitLabSCMOriginMonitorStrategy(boolean monitored, boolean build, BuildStatusPublishMode buildStatusPublishMode) {
         super(monitored, build, buildStatusPublishMode);

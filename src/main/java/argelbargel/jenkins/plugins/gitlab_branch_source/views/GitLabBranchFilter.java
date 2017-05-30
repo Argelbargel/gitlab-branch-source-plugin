@@ -25,8 +25,8 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.views;
 
 
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMBranchHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMBranchHead;
 import hudson.Extension;
 import hudson.model.Actionable;
 import hudson.model.Descriptor;

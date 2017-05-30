@@ -1,4 +1,4 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.settings;
 
 
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -39,6 +39,7 @@ public class MonitorStrategy extends AbstractDescribableImpl<MonitorStrategy> {
         @Nonnull
         public abstract T getDefaults();
 
+        @SuppressWarnings("unused")
         @Restricted(NoExternalUse.class)
         public final ListBoxModel doFillBuildStatusPublishModeItems() {
             StandardListBoxModel result = new StandardListBoxModel();

@@ -1,6 +1,7 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.heads;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
 import hudson.plugins.git.GitSCM;
 import jenkins.plugins.git.AbstractGitSCMSource.SCMRevisionImpl;
 import jenkins.scm.api.SCMHead;
@@ -24,11 +25,11 @@ public abstract class GitLabSCMHead extends SCMHead implements SCMHeadMixin {
         return createMergeRequest(id, name, iid, source, target, false);
     }
 
-    static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, int iid, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
+    public static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, int iid, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
         return new GitLabSCMMergeRequestHead(id, "!" + iid + " - " + name, source, target, mergeable);
     }
 
-    static GitLabSCMBranchHead createBranch(int projectId, String name, String hash, boolean hasMergeRequest) {
+    public static GitLabSCMBranchHead createBranch(int projectId, String name, String hash, boolean hasMergeRequest) {
         return new GitLabSCMBranchHead(projectId, name, hash, hasMergeRequest);
     }
 
@@ -49,5 +50,5 @@ public abstract class GitLabSCMHead extends SCMHead implements SCMHeadMixin {
     abstract GitLabSCMRefSpec getRefSpec();
 
     @Nonnull
-    abstract GitSCM createSCM(GitLabSCMSource source);
+    public abstract GitSCM createSCM(GitLabSCMSource source);
 }

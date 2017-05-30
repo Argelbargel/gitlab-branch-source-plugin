@@ -1,8 +1,9 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.events;
 
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead;
+
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMNavigator;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
 import com.dabsquared.gitlabjenkins.cause.CauseData;
 import com.dabsquared.gitlabjenkins.cause.GitLabWebHookCause;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.WebHook;

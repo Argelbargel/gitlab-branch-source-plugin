@@ -1,9 +1,11 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.heads;
 
+
+import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 
 import javax.annotation.Nonnull;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.BRANCHES;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.BRANCHES;
 
 
 public final class GitLabSCMBranchHead extends GitLabSCMHeadImpl {

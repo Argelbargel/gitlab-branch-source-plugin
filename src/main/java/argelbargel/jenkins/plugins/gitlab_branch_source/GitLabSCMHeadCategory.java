@@ -1,5 +1,7 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source;
 
+
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMBranchHead;
 import jenkins.scm.api.SCMHead;
 import jenkins.scm.api.SCMHeadCategory;
 import jenkins.scm.impl.ChangeRequestSCMHeadCategory;

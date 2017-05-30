@@ -1,6 +1,8 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.heads;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
+import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -24,12 +26,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMRefSpec.MERGE_REQUESTS;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRefSpec.MERGE_REQUESTS;
 
 
 public final class GitLabSCMMergeRequestHead extends GitLabSCMHeadImpl implements ChangeRequestSCMHead {
-    static final String CAN_BE_MERGED = "can_be_merged";
-
     private final int id;
     private final String title;
     private final GitLabSCMHead sourceBranch;
@@ -68,7 +68,7 @@ public final class GitLabSCMMergeRequestHead extends GitLabSCMHeadImpl implement
         return new GitLabSCMMergeRequestHead(id, title, sourceBranch, targetBranch, mergeable, true);
     }
 
-    GitLabSCMHead getSource() {
+    public GitLabSCMHead getSource() {
         return sourceBranch;
     }
 
@@ -83,11 +83,11 @@ public final class GitLabSCMMergeRequestHead extends GitLabSCMHeadImpl implement
         return getProjectId() == getTarget().getProjectId();
     }
 
-    boolean isMergeable() {
+    public boolean isMergeable() {
         return mergeable;
     }
 
-    boolean isMerged() {
+    public boolean isMerged() {
         return merge;
     }
 

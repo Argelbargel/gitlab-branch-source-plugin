@@ -1,6 +1,8 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMBranchHead;
+import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequestHead;
 import hudson.Extension;
 import jenkins.branch.BranchBuildStrategy;
 import jenkins.branch.BranchBuildStrategyDescriptor;

@@ -1,4 +1,4 @@
-package argelbargel.jenkins.plugins.gitlab_branch_source;
+package argelbargel.jenkins.plugins.gitlab_branch_source.heads;
 
 
 import org.eclipse.jgit.transport.RefSpec;
@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-enum GitLabSCMRefSpec {
+public enum GitLabSCMRefSpec {
     BRANCHES(new RefSpec("+refs/heads/*:refs/remotes/origin/*")),
     TAGS(new RefSpec("+refs/tags/*:refs/remotes/origin/tags/*")),
     MERGE_REQUESTS(new RefSpec("+refs/merge-requests/*/head:refs/remotes/origin/merge-requests/*"));
@@ -20,11 +20,11 @@ enum GitLabSCMRefSpec {
         this.sourceNamePattern = Pattern.compile(replaceWildcard(delegate.getSource(), "(.*)"));
     }
 
-    RefSpec delegate() {
+    public RefSpec delegate() {
         return delegate;
     }
 
-    String remoteName(String path) {
+    public String remoteName(String path) {
         Matcher m = sourceNamePattern.matcher(path);
         if (m.matches()) {
             return m.group(1);
