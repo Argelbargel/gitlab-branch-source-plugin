@@ -135,7 +135,7 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
             if (isNamedStageStartNode(node)) {
                 publishBuildStatus(build, metadata, running, getRunningContexts().push(node), "");
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
-                publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
+                publishBuildStatus(build, metadata, (node.getError()!=null ? failed : success), getRunningContexts().pop(), "");
             }
         }
 
