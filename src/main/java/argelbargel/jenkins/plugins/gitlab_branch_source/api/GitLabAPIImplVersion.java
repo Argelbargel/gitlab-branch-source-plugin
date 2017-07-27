@@ -19,7 +19,7 @@ enum GitLabAPIImplVersion {
         return stream(values())
                 .filter(v -> v.isSupported(version))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("no version of the found which supports server-version " + version));
+                .orElseThrow(() -> new NoSuchElementException("no version api-implementation found which supports server-version " + version));
     }
 
     private int version;
