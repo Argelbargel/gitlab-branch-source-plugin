@@ -5,6 +5,15 @@ public final class GitLabVersion {
     private String version;
     private String revision;
 
+    public GitLabVersion() {
+        this("", "");
+    }
+
+    GitLabVersion(String version, String revision) {
+        this.version = version;
+        this.revision = revision;
+    }
+
     public String getVersion() {
         return version;
     }

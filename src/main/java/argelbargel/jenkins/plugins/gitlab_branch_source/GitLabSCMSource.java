@@ -139,7 +139,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
     @Override
     public GitRepositoryBrowser getBrowser() {
         try {
-            return new GitLab(project.getWebUrl(), gitLabAPI(getSourceSettings()).getVersion());
+            return new GitLab(project.getWebUrl(), gitLabAPI(getSourceSettings()).getServerVersion());
         } catch (GitLabAPIException e) {
             LOGGER.warning("could not determine gitlab-version:" + e.getMessage());
             return super.getBrowser();

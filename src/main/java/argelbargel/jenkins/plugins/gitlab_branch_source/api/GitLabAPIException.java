@@ -4,6 +4,10 @@ import java.io.IOException;
 
 public final class GitLabAPIException extends IOException {
     GitLabAPIException(Exception e) {
-        super("error accessing gitlab-api: " + e.getMessage(), e.getCause());
+        this("error accessing gitlab-api: " + e.getMessage(), e.getCause());
+    }
+
+    GitLabAPIException(String message, Throwable cause) {
+        super(message, cause.getCause());
     }
 }

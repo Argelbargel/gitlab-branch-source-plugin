@@ -1,5 +1,6 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.api;
 
+
 import org.apache.commons.lang.StringUtils;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.http.Query;
@@ -19,7 +20,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
@@ -27,45 +30,64 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectVisibility.ALL;
 
 
-public final class GitLabAPI {
+public abstract class GitLabAPI {
+    protected static final Logger LOGGER = Logger.getLogger(GitLabAPI.class.getName());
     private static final String PATH_SEP = "/";
+    private static final Map<String, String> VERSION_CACHE = new VersionCache(10);
 
     public static GitLabAPI connect(String url, String token) throws GitLabAPIException {
-        try {
-            return new GitLabAPI(GitlabAPI.connect(url, token));
-        } catch (Exception e) {
-            throw new GitLabAPIException(e);
-        }
+        GitlabAPI delegate = GitlabAPI.connect(url, token);
+        String version = retrieveServerVersion(delegate, url);
+        return GitLabAPIImplVersion.byServerVersion(version).create(delegate, version);
     }
 
-    private static final Logger LOGGER = Logger.getLogger(GitLabAPI.class.getName());
-
-    private final GitlabAPI delegate;
-
-    private GitLabAPI(GitlabAPI delegate) {
-        this.delegate = delegate;
-    }
-
-    public String getVersion() throws GitLabAPIException {
+    private static String retrieveServerVersion(GitlabAPI delegate, String url) throws GitLabAPIException {
         try {
-            return delegate.retrieve().to("/version", GitLabVersion.class).toString();
+            if (!VERSION_CACHE.containsKey(url)) {
+                VERSION_CACHE.put(url, delegate.retrieve().to("/version", GitLabVersion.class).toString());
+            }
+            return VERSION_CACHE.get(url);
         } catch (IOException e) {
             throw new GitLabAPIException(e);
         }
     }
 
-    public GitLabProject getProject(int id) throws GitLabAPIException {
+
+    private final GitlabAPI delegate;
+    private final int apiVersion;
+    private final String serverVersion;
+
+
+    GitLabAPI(GitlabAPI delegate, int apiVersion, String serverVersion) {
+        this.apiVersion = apiVersion;
+        this.serverVersion = serverVersion;
+        this.delegate = delegate;
+    }
+
+    protected final GitlabAPI getDelegate() {
+        return delegate;
+    }
+
+    public final int getVersion() {
+        return apiVersion;
+    }
+
+    public final String getServerVersion() throws GitLabAPIException {
+        return serverVersion;
+    }
+
+    public final GitLabProject getProject(int id) throws GitLabAPIException {
         return getProject((Serializable) id);
     }
 
-    public GitLabProject getProject(String name) throws GitLabAPIException {
+    public final GitLabProject getProject(String name) throws GitLabAPIException {
         return getProject((Serializable) encode(name));
     }
 
-    private GitLabProject getProject(Serializable nameOrId) throws GitLabAPIException {
+    protected GitLabProject getProject(Serializable nameOrId) throws GitLabAPIException {
         try {
             String tailUrl = GitlabProject.URL + "/" + nameOrId;
-            return delegate.retrieve().to(tailUrl, GitLabProject.class);
+            return getDelegate().retrieve().to(tailUrl, GitLabProject.class);
         } catch (FileNotFoundException e) {
             throw new NoSuchElementException("unknown project " + nameOrId);
         } catch (IOException e) {
@@ -73,13 +95,14 @@ public final class GitLabAPI {
         }
     }
 
-    public List<GitlabBranch> getBranches(int id) throws GitLabAPIException {
+    public final List<GitlabBranch> getBranches(int id) throws GitLabAPIException {
         return getBranches((Serializable) id);
     }
 
-    private List<GitlabBranch> getBranches(Serializable nameOrId) throws GitLabAPIException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected List<GitlabBranch> getBranches(Serializable nameOrId) throws GitLabAPIException {
         try {
-            return delegate.getBranches(nameOrId);
+            return getDelegate().getBranches(nameOrId);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
@@ -88,7 +111,7 @@ public final class GitLabAPI {
     public GitlabBranch getBranch(int projectId, String branch) throws GitLabAPIException {
         try {
             String tailUrl = GitlabProject.URL + PATH_SEP + projectId + GitlabBranch.URL + PATH_SEP + URLEncoder.encode(branch, "UTF-8");
-            return delegate.retrieve().to(tailUrl, GitlabBranch.class);
+            return getDelegate().retrieve().to(tailUrl, GitlabBranch.class);
         } catch (FileNotFoundException e) {
             throw new NoSuchElementException("unknown branch " + branch);
         } catch (Exception e) {
@@ -96,13 +119,14 @@ public final class GitLabAPI {
         }
     }
 
-    public List<GitlabTag> getTags(int id) throws GitLabAPIException {
+    public final List<GitlabTag> getTags(int id) throws GitLabAPIException {
         return getTags((Serializable) id);
     }
 
-    private List<GitlabTag> getTags(Serializable nameOrId) throws GitLabAPIException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected List<GitlabTag> getTags(Serializable nameOrId) throws GitLabAPIException {
         try {
-            return delegate.getTags(nameOrId);
+            return getDelegate().getTags(nameOrId);
         } catch (IOException e) {
             throw new GitLabAPIException(e);
         }
@@ -111,7 +135,7 @@ public final class GitLabAPI {
     public GitlabTag getTag(int projectId, String tag) throws GitLabAPIException {
         try {
             String tailUrl = GitlabProject.URL + PATH_SEP + projectId + GitlabTag.URL + PATH_SEP + URLEncoder.encode(tag, "UTF-8");
-            return delegate.retrieve().to(tailUrl, GitlabTag.class);
+            return getDelegate().retrieve().to(tailUrl, GitlabTag.class);
         } catch (FileNotFoundException e) {
             throw new NoSuchElementException("unknown tag " + tag);
         } catch (Exception e) {
@@ -122,42 +146,31 @@ public final class GitLabAPI {
     public List<GitLabMergeRequest> getMergeRequests(int projectId) throws GitLabAPIException {
         try {
             String tailUrl = "/projects/" + projectId + "/merge_requests?state=opened";
-            return delegate.retrieve()
+            return getDelegate().retrieve()
                     .getAll(tailUrl, GitLabMergeRequest[].class);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
     }
 
-    public GitLabMergeRequest getMergeRequest(int projectId, String mergeRequestId) throws GitLabAPIException {
-        return getMergeRequest(projectId, Integer.parseInt(mergeRequestId));
-    }
+    public abstract GitLabMergeRequest getMergeRequest(int projectId, String mergeRequestId) throws GitLabAPIException;
 
-    public GitLabMergeRequest getMergeRequest(int projectId, int mergeRequestId) throws GitLabAPIException {
-        try {
-            String tailUrl = "/projects/" + projectId + "/merge_requests/" + mergeRequestId;
-            return delegate.retrieve().to(tailUrl, GitLabMergeRequest.class);
-        } catch (FileNotFoundException e) {
-            throw new NoSuchElementException("unknown merge-request for project " + projectId + ": " + mergeRequestId);
-        } catch (Exception e) {
-            throw new GitLabAPIException(e);
-        }
-    }
+    public abstract GitLabMergeRequest getMergeRequest(int projectId, int mergeRequestId) throws GitLabAPIException;
 
     public List<GitLabProject> findProjects(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
         LOGGER.fine("finding projects for group" + group + ", " + selector + ", " + visibility + ", " + searchPattern + "...");
         return findProjects(projectUrl(group, selector, visibility, searchPattern));
     }
 
-
-    public List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
+    public final List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
         LOGGER.fine("finding projects for " + selector + ", " + visibility + ", " + searchPattern + "...");
         return findProjects(projectUrl(selector, visibility, searchPattern));
     }
 
-    private List<GitLabProject> findProjects(String url) throws GitLabAPIException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected List<GitLabProject> findProjects(String url) throws GitLabAPIException {
         try {
-            return delegate
+            return getDelegate()
                     .retrieve()
                     .getAll(url, GitLabProject[].class);
         } catch (Exception e) {
@@ -167,7 +180,7 @@ public final class GitLabAPI {
 
     public GitLabGroup getGroup(int id) throws GitLabAPIException {
         try {
-            return delegate.retrieve().to(GitlabGroup.URL + PATH_SEP + id, GitLabGroup.class);
+            return getDelegate().retrieve().to(GitlabGroup.URL + PATH_SEP + id, GitLabGroup.class);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
@@ -175,7 +188,7 @@ public final class GitLabAPI {
 
     public GitlabCommit getCommit(int id, String ref) throws GitLabAPIException {
         try {
-            return delegate.getCommit(id, ref);
+            return getDelegate().getCommit(id, ref);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
@@ -189,14 +202,14 @@ public final class GitLabAPI {
 
 
             String tailUrl = GitlabProject.URL + "/" + id + "/repository" + GitlabRepositoryTree.URL + query.toString();
-            GitlabRepositoryTree[] tree = delegate.retrieve().to(tailUrl, GitlabRepositoryTree[].class);
+            GitlabRepositoryTree[] tree = getDelegate().retrieve().to(tailUrl, GitlabRepositoryTree[].class);
             return Arrays.asList(tree);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
     }
 
-    public GitlabSystemHook registerSystemHook(URL url) throws GitLabAPIException {
+    public final GitlabSystemHook registerSystemHook(URL url) throws GitLabAPIException {
         try {
             return registerSystemHook(url.toString());
         } catch (IOException e) {
@@ -204,21 +217,22 @@ public final class GitLabAPI {
         }
     }
 
-    private GitlabSystemHook registerSystemHook(String url) throws IOException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected GitlabSystemHook registerSystemHook(String url) throws IOException {
         LOGGER.fine("registering system-hook " + url + "...");
-        for (GitlabSystemHook hook : delegate.getSystemHooks()) {
+        for (GitlabSystemHook hook : getDelegate().getSystemHooks()) {
             if (hook.getUrl().equals(url)) {
                 return hook;
             }
         }
 
-        return delegate.dispatch()
+        return getDelegate().dispatch()
                 .with("url", url)
                 .with("push_events", false)
                 .to("/hooks", GitlabSystemHook.class);
     }
 
-    public boolean unregisterSystemHook(URL url) throws GitLabAPIException {
+    public final boolean unregisterSystemHook(URL url) throws GitLabAPIException {
         try {
             return unregisterSystemHook(url.toString());
         } catch (IOException e) {
@@ -226,19 +240,20 @@ public final class GitLabAPI {
         }
     }
 
-    private boolean unregisterSystemHook(String url) throws IOException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected boolean unregisterSystemHook(String url) throws IOException {
         LOGGER.finer("looking up system-hooks...");
-        for (GitlabSystemHook hook : delegate.getSystemHooks()) {
+        for (GitlabSystemHook hook : getDelegate().getSystemHooks()) {
             if (hook.getUrl().equals(url)) {
                 LOGGER.fine("un-registering system-hook " + url + "...");
-                delegate.deleteSystemHook(hook.getId());
+                getDelegate().deleteSystemHook(hook.getId());
                 return true;
             }
         }
         return false;
     }
 
-    public GitlabProjectHook registerProjectHook(URL url, int projectId) throws GitLabAPIException {
+    public final GitlabProjectHook registerProjectHook(URL url, int projectId) throws GitLabAPIException {
         try {
             return registerProjectHook(url.toString(), projectId);
         } catch (IOException e) {
@@ -246,18 +261,19 @@ public final class GitLabAPI {
         }
     }
 
-    private GitlabProjectHook registerProjectHook(String url, int projectId) throws IOException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected GitlabProjectHook registerProjectHook(String url, int projectId) throws IOException {
         LOGGER.fine("registering project-hook for project " + projectId + ": " + url + "...");
-        for (GitlabProjectHook hook : delegate.getProjectHooks(projectId)) {
+        for (GitlabProjectHook hook : getDelegate().getProjectHooks(projectId)) {
             if (hook.getUrl().equals(url)) {
                 return hook;
             }
         }
 
-        return delegate.addProjectHook(projectId, url, true, false, true, true, false);
+        return getDelegate().addProjectHook(projectId, url, true, false, true, true, false);
     }
 
-    public boolean unregisterProjectHook(URL url, int projectId) throws GitLabAPIException {
+    public final boolean unregisterProjectHook(URL url, int projectId) throws GitLabAPIException {
         try {
             return unregisterProjectHook(url.toString(), projectId);
         } catch (IOException e) {
@@ -265,13 +281,14 @@ public final class GitLabAPI {
         }
     }
 
-    private boolean unregisterProjectHook(String url, int projectId) throws IOException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected boolean unregisterProjectHook(String url, int projectId) throws IOException {
         LOGGER.finer("looking up project-hooks for project " + projectId + "...");
-        for (GitlabProjectHook hook : delegate.getProjectHooks(projectId)) {
+        for (GitlabProjectHook hook : getDelegate().getProjectHooks(projectId)) {
             if (hook.getUrl().equals(url)) {
                 LOGGER.fine("un-registering project-hook for project " + projectId + ": " + url + "...");
                 String tailUrl = GitlabProject.URL + PATH_SEP + hook.getProjectId() + GitlabProjectHook.URL + PATH_SEP + hook.getId();
-                delegate.retrieve().method("DELETE").to(tailUrl, GitlabProjectHook[].class);
+                getDelegate().retrieve().method("DELETE").to(tailUrl, GitlabProjectHook[].class);
                 return true;
             }
         }
@@ -279,7 +296,8 @@ public final class GitLabAPI {
         return false;
     }
 
-    private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
+    @SuppressWarnings("WeakerAccess") // API
+    protected String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
         StringBuilder urlBuilder = new StringBuilder(GitlabGroup.URL).append(PATH_SEP).append(group).append(GitLabProject.URL);
 
         if (!VISIBLE.equals(selector)) {
@@ -297,8 +315,8 @@ public final class GitLabAPI {
         return urlBuilder.toString();
     }
 
-
-    private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
+    @SuppressWarnings("WeakerAccess") // API
+    protected String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
         StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL)
                 .append(PATH_SEP).append(selector.id());
 
@@ -313,11 +331,26 @@ public final class GitLabAPI {
         return urlBuilder.toString();
     }
 
-    private String encode(String in) throws GitLabAPIException {
+    @SuppressWarnings("WeakerAccess") // API
+    protected final String encode(String in) throws GitLabAPIException {
         try {
             return URLEncoder.encode(in, "utf-8");
         } catch (UnsupportedEncodingException e) {
             throw new GitLabAPIException(e);
+        }
+    }
+
+    private static final class VersionCache extends LinkedHashMap<String, String> {
+        private final int maxSize;
+
+        private VersionCache(int size) {
+            super(size, 0.9f, true);
+            maxSize = size;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+            return size() > maxSize;
         }
     }
 }

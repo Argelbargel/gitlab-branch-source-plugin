@@ -112,6 +112,6 @@ abstract class GitLabSCMHeadImpl extends GitLabSCMHead {
 
     // TODO: do we need this? Would prefer it to stay in GitLabSCMSource only
     private GitLab getBrowser(int projectId, @Nonnull GitLabSCMSource source) throws GitLabAPIException {
-        return new GitLab(getProject(projectId, source).getWebUrl(), gitLabAPI(source.getSourceSettings()).getVersion());
+        return new GitLab(getProject(projectId, source).getWebUrl(), gitLabAPI(source.getSourceSettings()).getServerVersion());
     }
 }
