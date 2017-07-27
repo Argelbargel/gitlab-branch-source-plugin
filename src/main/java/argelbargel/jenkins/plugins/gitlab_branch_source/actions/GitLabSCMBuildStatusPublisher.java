@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
+import static java.util.logging.Level.FINE;
 
 
 /**
@@ -91,6 +92,9 @@ public final class GitLabSCMBuildStatusPublisher {
                 LOGGER.log(WARNING, "cannot publish build-status pending as no gitlab-connection is configured!");
             } else {
                 try {
+                    if (LOGGER.isLoggable(FINE)) {
+                        LOGGER.log(FINE, "setting build-status of '" + context + "' for project " + projectId + " to " + state + "...");
+                    }
                     client.changeBuildStatus(projectId, hash, state, ref, context, Jenkins.getInstance().getRootUrl() + run.getUrl(), description);
                 } catch (Exception e) {
                     LOGGER.log(SEVERE, "failed to set build-status of '" + context + "' for project " + projectId + " to " + state, e);
