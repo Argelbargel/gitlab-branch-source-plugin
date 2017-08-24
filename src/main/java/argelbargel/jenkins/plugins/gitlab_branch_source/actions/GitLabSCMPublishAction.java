@@ -9,12 +9,14 @@ import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.workflow.actions.ErrorAction;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepEndNode;
 import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
 import org.jenkinsci.plugins.workflow.flow.GraphListener;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -128,7 +130,16 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
             if (isNamedStageStartNode(node)) {
                 publishBuildStatus(build, metadata, running, getRunningContexts().push(node), "");
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
-                publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
+                ErrorAction error = node.getError();
+                if (error != null) {
+                    if (error.getError() instanceof FlowInterruptedException) {
+                        publishBuildStatus(build, metadata, canceled, getRunningContexts().pop(), "");
+                    } else {
+                        publishBuildStatus(build, metadata, failed, getRunningContexts().pop(), "");
+                    }
+                } else {
+                    publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
+                }
             }
         }
 
