@@ -4,9 +4,12 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.hooks;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMNavigator;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMSource;
 import hudson.Extension;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
 import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.model.UnprotectedRootAction;
+import hudson.security.ACL;
 import jenkins.model.Jenkins;
 import jenkins.scm.api.SCMNavigator;
 import jenkins.scm.api.SCMNavigatorOwner;
@@ -44,6 +47,15 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
         return Jenkins.getInstance().getExtensionList(RootAction.class).get(GitLabSCMWebHook.class);
     }
 
+    @Initializer(after = InitMilestone.JOB_LOADED)
+    public static void initialize() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ACL.impersonate(ACL.SYSTEM, new ListenerInitializerTask(GitLabSCMWebHook.get()));
+            }
+        }).start();
+    }
 
     private final HookManager manager;
     private final HookHandler handler;
@@ -51,7 +63,6 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
     public GitLabSCMWebHook() {
          manager = new HookManager();
          handler = new HookHandler();
-         new Thread(new ListenerInitializerTask()).start();
     }
 
     public void addListener(GitLabSCMNavigator navigator, Item owner) {
@@ -127,7 +138,13 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
 
     }
 
-    private class ListenerInitializerTask implements Runnable {
+    private static class ListenerInitializerTask implements Runnable {
+        private final GitLabSCMWebHook hook;
+
+        private ListenerInitializerTask(GitLabSCMWebHook hook) {
+            this.hook = hook;
+        }
+
         @Override
         public void run() {
             for (SCMNavigatorOwner owner : Jenkins.getInstance().getAllItems(SCMNavigatorOwner.class)) {
@@ -149,13 +166,13 @@ public final class GitLabSCMWebHook implements UnprotectedRootAction {
 
         private void handle(GitLabSCMSource source, SCMSourceOwner owner) {
             if (source.getListenToWebHooks()) {
-                addListener(source, owner);
+                hook.addListener(source, owner);
             }
         }
 
         private void handle(GitLabSCMNavigator navigator, SCMNavigatorOwner owner) {
             if (navigator.getListenToWebHooks() && !StringUtils.isEmpty(navigator.getConnectionName())) {
-                addListener(navigator, owner);
+                hook.addListener(navigator, owner);
             }
         }
     }
