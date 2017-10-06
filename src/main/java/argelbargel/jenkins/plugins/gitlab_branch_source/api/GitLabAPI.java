@@ -86,7 +86,14 @@ public final class GitLabAPI {
 
     public GitlabBranch getBranch(int projectId, String branch) throws GitLabAPIException {
         try {
+            // TODO: Find out the reason for appearence of extra slashes in URL
+            // See https://github.com/Argelbargel/gitlab-branch-source-plugin/issues/43
             String tailUrl = GitlabProject.URL + PATH_SEP + projectId + GitlabBranch.URL + PATH_SEP + URLEncoder.encode(branch, "UTF-8");
+
+            // TODO: Handle redirects correctly
+            // Workaround for ISSUE-43
+            tailUrl = tailUrl.replaceAll("//", "/");
+
             return delegate.retrieve().to(tailUrl, GitlabBranch.class);
         } catch (FileNotFoundException e) {
             throw new NoSuchElementException("unknown branch " + branch);
