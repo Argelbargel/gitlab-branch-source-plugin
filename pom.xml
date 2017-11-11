@@ -36,106 +36,79 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>branch-api</artifactId>
-            <version>2.0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>cloudbees-folder</artifactId>
-            <version>6.0.4</version>
+            <version>2.0.14</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-            <version>2.1.13</version>
+            <version>2.1.16</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>git</artifactId>
-            <version>3.3.0</version>
+            <version>3.6.4</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>git-client</artifactId>
-            <version>2.4.5</version>
+            <version>2.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>gitlab-plugin</artifactId>
-            <version>1.4.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>scm-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-api</artifactId>
-            <version>2.13</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-cps</artifactId>
-            <version>2.30</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-job</artifactId>
-            <version>2.11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-multibranch</artifactId>
-            <version>2.14</version>
+            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.gitlab</groupId>
             <artifactId>java-gitlab-api</artifactId>
             <version>1.2.7</version>
         </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>scm-api</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-api</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>2.41</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>2.11</version><!-- newer versions require JDK 1.8 -->
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-multibranch</artifactId>
+            <version>2.16</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>pipeline-stage-step</artifactId>
-            <version>2.2</version>
+            <version>2.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-basic-steps</artifactId>
-            <version>2.4</version>
+            <version>2.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-durable-task-step</artifactId>
-            <version>2.11</version>
+            <version>2.17</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- without this the build fails because of cyclic-dependencies -->
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-scm-step</artifactId>
-            <version>2.4</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- by default 1.4 is installed which causes an StackOverflowError -->
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>structs</artifactId>
-            <version>1.6</version>
-            <scope>test</scope>
-        </dependency>
-
-
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>github-branch-source</artifactId>
-                    <version>2.0.5</version>
-                    <scope>test</scope>
-                </dependency>
         <!-- TODO: i'd like to have those for local development but not when building with travis...
                 <dependency>
                     <groupId>org.jenkins-ci.plugins</groupId>

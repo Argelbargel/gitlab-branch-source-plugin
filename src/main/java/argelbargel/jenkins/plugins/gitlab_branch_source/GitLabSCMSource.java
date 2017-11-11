@@ -214,6 +214,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
         return hookListener;
     }
 
+/*
     @Override
     public GitRepositoryBrowser getBrowser() {
         try {
@@ -223,6 +224,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
             return super.getBrowser();
         }
     }
+*/
 
     public boolean buildMerged(GitLabSCMMergeRequestHead head) {
         return settings.determineMergeRequestStrategyValue(head, settings.originMonitorStrategy().buildMerged(), settings.forksMonitorStrategy().buildMerged());
@@ -323,7 +325,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
             }
         } else {
             scm = (GitSCM) super.build(head, revision);
-            scm.setBrowser(getBrowser());
+//            scm.setBrowser(getBrowser());
         }
 
         return scm;
