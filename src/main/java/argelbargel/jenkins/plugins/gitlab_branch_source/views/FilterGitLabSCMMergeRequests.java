@@ -25,50 +25,53 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.views;
 
 
+import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMMergeRequestHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import hudson.Extension;
 import hudson.model.Descriptor;
-import hudson.model.TopLevelItem;
-import hudson.model.View;
+import hudson.model.Item;
 import hudson.views.ViewJobFilter;
-import jenkins.scm.api.SCMHead;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
-import java.util.List;
+
+import static argelbargel.jenkins.plugins.gitlab_branch_source.views.AbstractGitLabSCMViewJobFilter.FilterMode.ADD;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.views.AbstractGitLabSCMViewJobFilter.FilterMode.NONE;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.views.AbstractGitLabSCMViewJobFilter.FilterMode.REMOVE;
 
 
 @SuppressWarnings("unused")
-public class GitLabMergeRequestFilter extends ViewJobFilter {
-    private boolean originOnly = false;
+public class FilterGitLabSCMMergeRequests extends AbstractGitLabSCMViewJobFilter {
+    private boolean showOnlyMergeRequestsFromOrigin = false;
 
     @DataBoundConstructor
-    public GitLabMergeRequestFilter() { /* NOOP */ }
-
-
-    @DataBoundSetter
-    public void setOriginOnly(boolean value) {
-        originOnly = value;
+    public FilterGitLabSCMMergeRequests() {
+        super(DEFAULT_FINDER);
     }
 
-    public boolean getOriginOnly() {
-        return originOnly;
+    FilterGitLabSCMMergeRequests(GitLabSCMHeadFinder finder) {
+        super(finder);
+    }
+
+    @DataBoundSetter
+    public void setShowOnlyMergeRequestsFromOrigin(boolean value) {
+        showOnlyMergeRequestsFromOrigin = value;
+    }
+
+    public boolean getShowOnlyMergeRequestsFromOrigin() {
+        return showOnlyMergeRequestsFromOrigin;
     }
 
     @Override
-    public List<TopLevelItem> filter(List<TopLevelItem> added, List<TopLevelItem> all, View filteringView) {
-        for (TopLevelItem item : all) {
-            if (added.contains(item)) {
-                continue;
-            }
-            SCMHead head = SCMHead.HeadByItem.findHead(item);
-            if (head instanceof GitLabSCMMergeRequestHead && (!originOnly || ((GitLabSCMMergeRequestHead) head).fromOrigin())) {
-                added.add(item);
-            }
+    protected FilterMode filter(Item item, GitLabSCMHead head) {
+        // ignore everything that's not a GitLabSCMMergeRequest
+        if (head == null || !GitLabSCMMergeRequestHead.class.isInstance(head)) {
+            return NONE;
         }
-        return added;
+
+        return (showOnlyMergeRequestsFromOrigin && !((GitLabSCMMergeRequestHead) head).fromOrigin()) ? REMOVE : NONE;
     }
 
     @Extension(optional = true)
@@ -76,7 +79,7 @@ public class GitLabMergeRequestFilter extends ViewJobFilter {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return Messages.GitLabSCMViewFilter_MergeRequest_DisplayName();
+            return Messages.ViewJobFilter_FilterMergeRequests_DisplayName();
         }
     }
 }
