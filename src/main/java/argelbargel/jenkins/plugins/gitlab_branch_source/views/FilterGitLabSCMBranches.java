@@ -32,99 +32,73 @@ import hudson.Extension;
 import hudson.model.Actionable;
 import hudson.model.Descriptor;
 import hudson.model.Item;
+import hudson.model.TopLevelItem;
 import hudson.views.ViewJobFilter;
 import jenkins.scm.api.metadata.PrimaryInstanceMetadataAction;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
-
-import static argelbargel.jenkins.plugins.gitlab_branch_source.views.AbstractGitLabSCMViewJobFilter.FilterMode.NONE;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.views.AbstractGitLabSCMViewJobFilter.FilterMode.REMOVE;
 
 
 @SuppressWarnings("unused")
 public class FilterGitLabSCMBranches extends AbstractGitLabSCMViewJobFilter {
     private static final Pattern DEFAULT_PATTERN = Pattern.compile(".*");
 
-    private boolean showOnlyDefaultBranches = false;
-    private boolean showBranchesWithMergeRequests = true;
-    private Pattern branchNamePattern = DEFAULT_PATTERN;
+    private final boolean matchOnlyDefaultBranches;
+    private final boolean matchOnlyBranchesWithMergeRequests;
+
 
     @DataBoundConstructor
-    public FilterGitLabSCMBranches() {
-        super(DEFAULT_FINDER);
+    public FilterGitLabSCMBranches(String includeExcludeTypeString, boolean matchOnlyDefaultBranches, boolean matchOnlyBranchesWithMergeRequests) {
+        this(includeExcludeTypeString, matchOnlyDefaultBranches, matchOnlyBranchesWithMergeRequests, DEFAULT_FINDER);
     }
 
-    FilterGitLabSCMBranches(GitLabSCMHeadFinder finder) {
-        super(finder);
+    FilterGitLabSCMBranches(String includeExcludeTypeString, boolean matchOnlyDefaultBranches, boolean matchOnlyBranchesWithMergeRequests, GitLabSCMHeadFinder finder) {
+        super(includeExcludeTypeString, finder);
+        this.matchOnlyDefaultBranches = matchOnlyDefaultBranches;
+        this.matchOnlyBranchesWithMergeRequests = matchOnlyBranchesWithMergeRequests;
     }
 
-    @DataBoundSetter
-    public void setBranchNamePattern(String pattern) {
-        branchNamePattern = StringUtils.isNotBlank(pattern) ? Pattern.compile(pattern) : DEFAULT_PATTERN;
+    public boolean getMatchOnlyBranchesWithMergeRequests() {
+        return matchOnlyBranchesWithMergeRequests;
     }
 
-    public String getBranchNamePattern() {
-        return branchNamePattern.pattern();
-    }
-
-    @DataBoundSetter
-    public void setShowBranchesWithMergeRequests(boolean value) {
-        showBranchesWithMergeRequests = value;
-    }
-
-    public boolean getShowBranchesWithMergeRequests() {
-        return showBranchesWithMergeRequests;
-    }
-
-    @DataBoundSetter
-    public void setShowOnlyDefaultBranches(boolean value) {
-        showOnlyDefaultBranches = value;
-    }
-
-    public boolean getShowOnlyDefaultBranches() {
-        return showOnlyDefaultBranches;
+    public boolean getMatchOnlyDefaultBranches() {
+        return matchOnlyDefaultBranches;
     }
 
 
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
-    protected FilterMode filter(Item item, GitLabSCMHead head) {
-        // ignore everything that's not a GitLabSCMBranch
+    protected boolean matches(TopLevelItem item, GitLabSCMHead head) {
         if (head == null || !GitLabSCMBranchHead.class.isInstance(head)) {
-            return NONE;
+            return false;
         }
 
-        return filter(item, (GitLabSCMBranchHead) head);
+        if (matchOnlyDefaultBranches) {
+            return isDefaultBranch(item);
+        }
 
+        if (matchOnlyBranchesWithMergeRequests) {
+            return hasMergeRequest(head);
+        }
+
+        return true;
     }
 
-    private FilterMode filter(Item item, GitLabSCMBranchHead head) {
-        if (showOnlyDefaultBranches && item instanceof Actionable  && !isDefaultBranch((Actionable)item)) {
-            return REMOVE;
-        }
-
-        if (!showBranchesWithMergeRequests && head.hasMergeRequest()) {
-            return REMOVE;
-        }
-
-        if (!branchNamePattern.matcher(head.getName()).matches()) {
-            return REMOVE;
-        }
-
-        return NONE;
+    private boolean hasMergeRequest(GitLabSCMHead head) {
+        return head instanceof GitLabSCMBranchHead  && ((GitLabSCMBranchHead) head).hasMergeRequest();
     }
 
-
-    private boolean isDefaultBranch(Actionable item) {
-        return item.getAction(PrimaryInstanceMetadataAction.class) != null;
+    private boolean isDefaultBranch(Item item) {
+        return item instanceof  Actionable && ((Actionable) item).getAction(PrimaryInstanceMetadataAction.class) != null;
     }
 
     private boolean filterBranches(GitLabSCMBranchHead head) {
-        return showBranchesWithMergeRequests || !head.hasMergeRequest();
+        return matchOnlyBranchesWithMergeRequests || !head.hasMergeRequest();
     }
+
 
     @Extension(optional = true)
     public static class DescriptorImpl extends Descriptor<ViewJobFilter> {

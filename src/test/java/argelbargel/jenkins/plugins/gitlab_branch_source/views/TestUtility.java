@@ -14,10 +14,8 @@ import jenkins.scm.api.metadata.PrimaryInstanceMetadataAction;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,8 +24,7 @@ final class TestUtility {
     static final TopLevelItem NON_SCM_ITEM = createItem();
     static final TopLevelItem NON_GITLAB_SCM_ITEM = createItem();
     static final TopLevelItem GITLAB_SCM_TAG_ITEM = createItem();
-    static final TopLevelItem GITLAB_SCM_BRANCH1_ITEM = createItem();
-    static final TopLevelItem GITLAB_SCM_BRANCH2_ITEM = createItem();
+    static final TopLevelItem GITLAB_SCM_BRANCH_ITEM = createItem();
     static final TopLevelItem GITLAB_SCM_DEFAULT_BRANCH_ITEM = createDefaultBranchItem();
     static final TopLevelItem GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM = createItem();
     static final TopLevelItem GITLAB_SCM_MERGEREQUEST_FROM_ORIGIN_ITEM = createItem();
@@ -41,17 +38,11 @@ final class TestUtility {
         finder.put(NON_GITLAB_SCM_ITEM, mock(SCMHead.class));
         finder.put(GITLAB_SCM_TAG_ITEM, createGitLabSCMTagHead());
         finder.put(GITLAB_SCM_DEFAULT_BRANCH_ITEM, createGitLabSCMBranchHead());
-        finder.put(GITLAB_SCM_BRANCH1_ITEM, createGitLabSCMBranchHead("branch1"));
-        finder.put(GITLAB_SCM_BRANCH2_ITEM, createGitLabSCMBranchHead("branch2"));
+        finder.put(GITLAB_SCM_BRANCH_ITEM, createGitLabSCMBranchHead("branch"));
         finder.put(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM, createGitLabSCMBranchHead("",true));
         finder.put(GITLAB_SCM_MERGEREQUEST_FROM_ORIGIN_ITEM, createGitLabSCMMergeRequest(true));
         finder.put(GITLAB_SCM_MERGEREQUEST_FROM_FORK_ITEM, createGitLabSCMMergeRequest(false));
         return finder;
-    }
-
-    static void assertResultAndAdded(List<TopLevelItem> expected, List<TopLevelItem> result, List<TopLevelItem> added) {
-        assertEquals(expected, result);
-        assertEquals(result, added);
     }
 
     private static AbstractTopLevelItem createItem() {

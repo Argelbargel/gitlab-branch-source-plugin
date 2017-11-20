@@ -1,69 +1,56 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.views;
 
 
-import hudson.model.TopLevelItem;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_BRANCH1_ITEM;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_BRANCH2_ITEM;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_BRANCH_ITEM;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_DEFAULT_BRANCH_ITEM;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_MERGEREQUEST_FROM_ORIGIN_ITEM;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.GITLAB_SCM_TAG_ITEM;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.NON_GITLAB_SCM_ITEM;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.NON_SCM_ITEM;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.assertResultAndAdded;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.views.TestUtility.createFinder;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import static hudson.views.AbstractIncludeExcludeJobFilter.IncludeExcludeType.includeMatched;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 
 
 public class FilterGitLabSCMBranchesTest {
-    private FilterGitLabSCMBranches filter;
-
-    @Before
-    public void createFilter() throws Exception {
-        filter = new FilterGitLabSCMBranches(createFinder());
+    private static FilterGitLabSCMBranches createFilter(boolean matchOnlyDefaultBranch, boolean matchOnlyBranchesWithMergeRequests) throws Exception {
+        return new FilterGitLabSCMBranches(includeMatched.name(), matchOnlyDefaultBranch, matchOnlyBranchesWithMergeRequests, createFinder());
     }
 
     @Test
-    public void testFilterIgnoresNonBranchItems() {
-        List<TopLevelItem> added = new ArrayList<>(singletonList(NON_SCM_ITEM));
-        List<TopLevelItem> result = filter.filter(added, singletonList(GITLAB_SCM_TAG_ITEM), null);
-
-        assertResultAndAdded(singletonList(NON_SCM_ITEM), result, added);
+    public void doesNotMatchNonBranchItems() throws Exception {
+        FilterGitLabSCMBranches filter = createFilter(false, false);
+        assertFalse(filter.matches(NON_SCM_ITEM));
+        assertFalse(filter.matches(NON_GITLAB_SCM_ITEM));
+        assertFalse(filter.matches(GITLAB_SCM_TAG_ITEM));
+        assertFalse(filter.matches(GITLAB_SCM_MERGEREQUEST_FROM_ORIGIN_ITEM));
     }
 
     @Test
-    public void testFilterRemovesNonDefaultBranchItems() {
-        filter.setShowOnlyDefaultBranches(true);
-
-        List<TopLevelItem> added = new ArrayList<>(singletonList(GITLAB_SCM_BRANCH1_ITEM));
-        List<TopLevelItem> result = filter.filter(added, singletonList(GITLAB_SCM_BRANCH1_ITEM), null);
-
-        assertResultAndAdded(Collections.<TopLevelItem>emptyList(), result, added);
+    public void matchesBranchItems() throws Exception {
+        FilterGitLabSCMBranches filter = createFilter(false, false);
+        assertTrue(filter.matches(GITLAB_SCM_DEFAULT_BRANCH_ITEM));
+        assertTrue(filter.matches(GITLAB_SCM_BRANCH_ITEM));
+        assertTrue(filter.matches(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));
     }
 
     @Test
-    public void testFilterRemovesMergeRequestBranchItems() {
-        filter.setShowBranchesWithMergeRequests(false);
-
-        List<TopLevelItem> added = new ArrayList<>(singletonList(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));
-        List<TopLevelItem> result = filter.filter(added, singletonList(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM), null);
-
-        assertResultAndAdded(Collections.<TopLevelItem>emptyList(), result, added);
+    public void matchesOnlyDefaultBranchItems() throws Exception {
+        FilterGitLabSCMBranches filter = createFilter(true, false);
+        assertTrue(filter.matches(GITLAB_SCM_DEFAULT_BRANCH_ITEM));
+        assertFalse(filter.matches(GITLAB_SCM_BRANCH_ITEM));
+        assertFalse(filter.matches(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));
     }
 
     @Test
-    public void testFilterRemovesNonMatchingBranchesItems() {
-        filter.setBranchNamePattern(".*branch1");
-
-        List<TopLevelItem> added = new ArrayList<>(singletonList(GITLAB_SCM_BRANCH2_ITEM));
-        List<TopLevelItem> result = filter.filter(added, singletonList(GITLAB_SCM_BRANCH2_ITEM), null);
-
-        assertResultAndAdded(Collections.<TopLevelItem>emptyList(), result, added);
+    public void matchesOnlyBranchItemsWithMergeRequest() throws Exception {
+        FilterGitLabSCMBranches filter = createFilter(false, true);
+        assertFalse(filter.matches(GITLAB_SCM_DEFAULT_BRANCH_ITEM));
+        assertFalse(filter.matches(GITLAB_SCM_BRANCH_ITEM));
+        assertTrue(filter.matches(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));
     }
 }
