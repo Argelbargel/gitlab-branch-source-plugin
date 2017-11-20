@@ -25,9 +25,7 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.views;
 
 
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMMergeRequestHead;
-import argelbargel.jenkins.plugins.gitlab_branch_source.GitLabSCMTagHead;
 import argelbargel.jenkins.plugins.gitlab_branch_source.Messages;
 import hudson.Extension;
 import hudson.model.Descriptor;
@@ -39,20 +37,27 @@ import javax.annotation.Nonnull;
 
 
 @SuppressWarnings("unused")
-public class FilterGitLabSCMTags extends AbstractGitLabSCMViewJobFilter {
+public final class GitLabSCMMergeRequestFilter extends AbstractGitLabSCMViewJobFilter<GitLabSCMMergeRequestHead> {
+    private final boolean matchOnlyMergeRequestsFromOrigin;
+
     @DataBoundConstructor
-    public FilterGitLabSCMTags(String includeExcludeTypeString) {
-        this(includeExcludeTypeString, DEFAULT_FINDER);
+    public GitLabSCMMergeRequestFilter(String includeExcludeTypeString, boolean matchOnlyMergeRequestsFromOrigin) {
+        this(includeExcludeTypeString, matchOnlyMergeRequestsFromOrigin, DEFAULT_FINDER);
     }
 
-    FilterGitLabSCMTags(String includeExcludeTypeString, GitLabSCMHeadFinder finder) {
-        super(includeExcludeTypeString, finder);
+    GitLabSCMMergeRequestFilter(String includeExcludeTypeString, boolean matchOnlyMergeRequestsFromOrigin, GitLabSCMHeadFinder finder) {
+        super(includeExcludeTypeString, finder, GitLabSCMMergeRequestHead.class);
+        this.matchOnlyMergeRequestsFromOrigin = matchOnlyMergeRequestsFromOrigin;
+    }
+
+    public boolean getMatchOnlyMergeRequestsFromOrigin() {
+        return matchOnlyMergeRequestsFromOrigin;
     }
 
     @SuppressWarnings("SimplifiableIfStatement")
     @Override
-    protected boolean matches(TopLevelItem item, GitLabSCMHead head) {
-        return head != null && head instanceof GitLabSCMTagHead;
+    protected boolean matches(TopLevelItem item, GitLabSCMMergeRequestHead head) {
+        return !matchOnlyMergeRequestsFromOrigin || head.fromOrigin();
     }
 
 
@@ -61,7 +66,7 @@ public class FilterGitLabSCMTags extends AbstractGitLabSCMViewJobFilter {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return Messages.ViewJobFilter_FilterTags_DisplayName();
+            return Messages.MergeRequestFilter_DisplayName();
         }
     }
 }

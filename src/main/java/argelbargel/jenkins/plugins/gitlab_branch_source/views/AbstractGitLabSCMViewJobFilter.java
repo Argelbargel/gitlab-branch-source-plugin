@@ -10,7 +10,7 @@ import jenkins.scm.api.SCMHead;
 import java.io.Serializable;
 
 
-abstract class AbstractGitLabSCMViewJobFilter extends AbstractIncludeExcludeJobFilter {
+abstract class AbstractGitLabSCMViewJobFilter<HEAD extends GitLabSCMHead> extends AbstractIncludeExcludeJobFilter {
     static final GitLabSCMHeadFinder DEFAULT_FINDER = new GitLabSCMHeadFinder() {
         @Override
         SCMHead findHead(Item item) {
@@ -19,18 +19,25 @@ abstract class AbstractGitLabSCMViewJobFilter extends AbstractIncludeExcludeJobF
     };
 
     private final GitLabSCMHeadFinder finder;
+    private final Class<HEAD> headClass;
 
-    AbstractGitLabSCMViewJobFilter(String includeExcludeTypeString, GitLabSCMHeadFinder finder) {
+    AbstractGitLabSCMViewJobFilter(String includeExcludeTypeString, GitLabSCMHeadFinder finder, Class<HEAD> headClass) {
         super(includeExcludeTypeString);
         this.finder = finder;
+        this.headClass = headClass;
     }
 
     @Override
     protected final boolean matches(TopLevelItem item) {
-        return matches(item, finder.findGitLabSCMHead(item));
+        return matchesHead(item, finder.findGitLabSCMHead(item));
     }
 
-    protected abstract boolean matches(TopLevelItem item, GitLabSCMHead head);
+    @SuppressWarnings("unchecked")
+    private boolean matchesHead(TopLevelItem item, GitLabSCMHead head) {
+        return head != null && headClass.isInstance(head) && matches(item, (HEAD) head);
+    }
+
+    protected abstract boolean matches(TopLevelItem item, HEAD head);
 
 
     static abstract class GitLabSCMHeadFinder implements Serializable {

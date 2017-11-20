@@ -16,14 +16,14 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 
-public class FilterGitLabSCMBranchesTest {
-    private static FilterGitLabSCMBranches createFilter(boolean matchOnlyDefaultBranch, boolean matchOnlyBranchesWithMergeRequests) throws Exception {
-        return new FilterGitLabSCMBranches(includeMatched.name(), matchOnlyDefaultBranch, matchOnlyBranchesWithMergeRequests, createFinder());
+public class GitLabSCMBranchFilterTest {
+    private static GitLabSCMBranchFilter createFilter(boolean matchOnlyDefaultBranch, boolean matchOnlyBranchesWithMergeRequests) throws Exception {
+        return new GitLabSCMBranchFilter(includeMatched.name(), matchOnlyDefaultBranch, matchOnlyBranchesWithMergeRequests, createFinder());
     }
 
     @Test
     public void doesNotMatchNonBranchItems() throws Exception {
-        FilterGitLabSCMBranches filter = createFilter(false, false);
+        GitLabSCMBranchFilter filter = createFilter(false, false);
         assertFalse(filter.matches(NON_SCM_ITEM));
         assertFalse(filter.matches(NON_GITLAB_SCM_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_TAG_ITEM));
@@ -32,7 +32,7 @@ public class FilterGitLabSCMBranchesTest {
 
     @Test
     public void matchesBranchItems() throws Exception {
-        FilterGitLabSCMBranches filter = createFilter(false, false);
+        GitLabSCMBranchFilter filter = createFilter(false, false);
         assertTrue(filter.matches(GITLAB_SCM_DEFAULT_BRANCH_ITEM));
         assertTrue(filter.matches(GITLAB_SCM_BRANCH_ITEM));
         assertTrue(filter.matches(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));
@@ -40,7 +40,7 @@ public class FilterGitLabSCMBranchesTest {
 
     @Test
     public void matchesOnlyDefaultBranchItems() throws Exception {
-        FilterGitLabSCMBranches filter = createFilter(true, false);
+        GitLabSCMBranchFilter filter = createFilter(true, false);
         assertTrue(filter.matches(GITLAB_SCM_DEFAULT_BRANCH_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_BRANCH_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));
@@ -48,7 +48,7 @@ public class FilterGitLabSCMBranchesTest {
 
     @Test
     public void matchesOnlyBranchItemsWithMergeRequest() throws Exception {
-        FilterGitLabSCMBranches filter = createFilter(false, true);
+        GitLabSCMBranchFilter filter = createFilter(false, true);
         assertFalse(filter.matches(GITLAB_SCM_DEFAULT_BRANCH_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_BRANCH_ITEM));
         assertTrue(filter.matches(GITLAB_SCM_BRANCH_WITH_MERGE_REQUEST_ITEM));

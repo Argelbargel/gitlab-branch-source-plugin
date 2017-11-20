@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:st="jelly:stapler">
-    <f:entry title="${%Only default branch(es)}" field="matchOnlyDefaultBranches">
-        <f:checkbox default="false"/>
-    </f:entry>
-    <f:entry title="${%Only Branches with Merge Requests}" field="matchOnlyBranchesWithMergeRequests">
+    <f:entry title="${%Match only merge requests from origin}" field="matchOnlyMergeRequestsFromOrigin">
         <f:checkbox default="false"/>
     </f:entry>
     <st:include page="config.jelly" class="hudson.views.AbstractIncludeExcludeJobFilter" />

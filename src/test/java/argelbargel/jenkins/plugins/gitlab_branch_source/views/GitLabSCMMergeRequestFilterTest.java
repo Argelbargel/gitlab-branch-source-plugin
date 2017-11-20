@@ -16,14 +16,14 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 
-public class FilterGitLabSCMMergeRequestsTest {
-    private static FilterGitLabSCMMergeRequests createFilter(boolean matchOnlyMergeRequestsFromOrigin) throws Exception {
-        return new FilterGitLabSCMMergeRequests(includeMatched.name(), matchOnlyMergeRequestsFromOrigin, createFinder());
+public class GitLabSCMMergeRequestFilterTest {
+    private static GitLabSCMMergeRequestFilter createFilter(boolean matchOnlyMergeRequestsFromOrigin) throws Exception {
+        return new GitLabSCMMergeRequestFilter(includeMatched.name(), matchOnlyMergeRequestsFromOrigin, createFinder());
     }
 
     @Test
     public void doesNotMatchNonBranchItems() throws Exception {
-        FilterGitLabSCMMergeRequests filter = createFilter( false);
+        GitLabSCMMergeRequestFilter filter = createFilter( false);
         assertFalse(filter.matches(NON_SCM_ITEM));
         assertFalse(filter.matches(NON_GITLAB_SCM_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_TAG_ITEM));
@@ -33,14 +33,14 @@ public class FilterGitLabSCMMergeRequestsTest {
 
     @Test
     public void matchesMergeRequestItems() throws Exception {
-        FilterGitLabSCMMergeRequests filter = createFilter(false);
+        GitLabSCMMergeRequestFilter filter = createFilter(false);
         assertTrue(filter.matches(GITLAB_SCM_MERGEREQUEST_FROM_ORIGIN_ITEM));
         assertTrue(filter.matches(GITLAB_SCM_MERGEREQUEST_FROM_FORK_ITEM));
     }
 
     @Test
     public void matchesOnlyItemsWithMergeRequestsFromOrigin() throws Exception {
-        FilterGitLabSCMMergeRequests filter = createFilter(true);
+        GitLabSCMMergeRequestFilter filter = createFilter(true);
         assertTrue(filter.matches(GITLAB_SCM_MERGEREQUEST_FROM_ORIGIN_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_MERGEREQUEST_FROM_FORK_ITEM));
     }

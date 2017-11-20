@@ -14,14 +14,14 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 
-public class FilterGitLabSCMTagsTest {
-    private static FilterGitLabSCMTags createFilter() throws Exception {
-        return new FilterGitLabSCMTags(includeMatched.name(), createFinder());
+public class GitLabSCMTagFilterTest {
+    private static GitLabSCMTagFilter createFilter() throws Exception {
+        return new GitLabSCMTagFilter(includeMatched.name(), createFinder());
     }
 
     @Test
     public void doesNotMatchNonTagItems() throws Exception {
-        FilterGitLabSCMTags filter = createFilter();
+        GitLabSCMTagFilter filter = createFilter();
         assertFalse(filter.matches(NON_SCM_ITEM));
         assertFalse(filter.matches(NON_GITLAB_SCM_ITEM));
         assertFalse(filter.matches(GITLAB_SCM_BRANCH_ITEM));
@@ -30,7 +30,7 @@ public class FilterGitLabSCMTagsTest {
 
     @Test
     public void matchesTagItems() throws Exception {
-        FilterGitLabSCMTags filter = createFilter();
+        GitLabSCMTagFilter filter = createFilter();
         assertTrue(filter.matches(GITLAB_SCM_TAG_ITEM));
     }
 }
