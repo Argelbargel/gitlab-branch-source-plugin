@@ -29,9 +29,12 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProject
 public final class GitLabAPI {
     private static final String PATH_SEP = "/";
 
-    public static GitLabAPI connect(String url, String token) throws GitLabAPIException {
+    public static GitLabAPI connect(String url, String token, boolean ignoreCertificateErrors, int requestTimeout) throws GitLabAPIException {
         try {
-            return new GitLabAPI(GitlabAPI.connect(url, token));
+            GitlabAPI delegate = GitlabAPI.connect(url, token);
+            delegate.ignoreCertificateErrors(ignoreCertificateErrors);
+            delegate.setRequestTimeout(requestTimeout);
+            return new GitLabAPI(delegate);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
         }

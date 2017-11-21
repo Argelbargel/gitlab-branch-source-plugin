@@ -12,7 +12,6 @@ import com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig;
 import hudson.model.Item;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public final class GitLabHelper {
 
     public static GitLabAPI gitLabAPI(String connectionName) throws GitLabAPIException {
         GitLabConnection connection = gitLabConnection(connectionName);
-        return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()));
+        return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()), connection.isIgnoreCertificateErrors(), connection.getReadTimeout());
     }
 
     public static GitLabConnection gitLabConnection(String connectionName) {
@@ -56,19 +55,9 @@ public final class GitLabHelper {
         return names;
     }
 
-    static String gitLabConnectionId(String connectionName) {
-        try {
-            GitLabConnection conn = gitLabConnection(connectionName);
-            return DigestUtils.md5Hex(conn.getUrl()) + "::" + DigestUtils.md5Hex(gitLabApiToken(conn.getApiTokenId()));
-        } catch (NoSuchElementException e) {
-            return DigestUtils.md5Hex(connectionName);
-        }
-    }
-
     private static GitLabConnectionConfig connectionConfig() {
         return (GitLabConnectionConfig) Jenkins.getInstance().getDescriptor(GitLabConnectionConfig.class);
     }
-
 
     private static String gitLabApiToken(String id) {
         StandardCredentials credentials = CredentialsMatchers.firstOrNull(
