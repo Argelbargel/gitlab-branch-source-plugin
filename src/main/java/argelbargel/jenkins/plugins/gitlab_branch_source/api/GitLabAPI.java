@@ -33,7 +33,7 @@ public final class GitLabAPI {
         try {
             GitlabAPI delegate = GitlabAPI.connect(url, token);
             delegate.ignoreCertificateErrors(ignoreCertificateErrors);
-            if (requestTimeout != 0) {
+            if (requestTimeout > 0) {
                 delegate.setRequestTimeout(requestTimeout);
             }
             return new GitLabAPI(delegate);
