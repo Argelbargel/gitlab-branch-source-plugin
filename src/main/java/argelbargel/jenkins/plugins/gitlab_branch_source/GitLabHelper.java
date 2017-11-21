@@ -25,7 +25,7 @@ public final class GitLabHelper {
 
     public static GitLabAPI gitLabAPI(String connectionName) throws GitLabAPIException {
         GitLabConnection connection = gitLabConnection(connectionName);
-        return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()), connection.isIgnoreCertificateErrors(), connection.getReadTimeout());
+        return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()), connection.isIgnoreCertificateErrors());
     }
 
     public static GitLabConnection gitLabConnection(String connectionName) {
