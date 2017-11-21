@@ -28,8 +28,11 @@ public final class GitLabHelper {
     }
 
     public static GitLabAPI gitLabAPI(String connectionName) throws GitLabAPIException {
-        GitLabConnection connection = gitLabConnection(connectionName);
-        return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()));
+        return gitLabAPI(gitLabConnection(connectionName));
+    }
+
+    private static GitLabAPI gitLabAPI(GitLabConnection connection) throws GitLabAPIException {
+        return GitLabAPI.connect(connection.getUrl(), gitLabApiToken(connection.getApiTokenId()), connection.isIgnoreCertificateErrors(), connection.getReadTimeout());
     }
 
     public static GitLabConnection gitLabConnection(String connectionName) {
