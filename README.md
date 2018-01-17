@@ -1,6 +1,6 @@
 # Multibranch projects and organization folders from GitLab [![Build Status](https://travis-ci.org/Argelbargel/gitlab-branch-source-plugin.svg?branch=master)](https://travis-ci.org/Argelbargel/gitlab-branch-source-plugin)
 
-##Introduction
+## Introduction
 The GitLab Branch Source Plugin allows you to create a new project based on the repository structure based on your GitLab
  projects. It is heavily inspired by the [GitHub Branch Source Plugin](https://wiki.jenkins-ci.org/display/JENKINS/GitHub+Branch+Source+Plugin),
   builds upon the [GitLab Plugin](https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin) and uses the
@@ -23,7 +23,7 @@ merge requests, adds new jobs accordingly and builds them. If Jenkins (or rather
 GitLab) is allowed to do so, it will setup these webhooks automatically for you.
 
 When Jenkins is allowed to do so build results will be reported
-back to GitLab. You can choose wheter only the build result (success/failure) get reported or if Jenkins reports every 
+back to GitLab. You can choose whether only the build result (success/failure) get reported or if Jenkins reports every 
 stage defined in your pipeline.
 
 ## GitLab merge requests
