@@ -2,7 +2,7 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.actions;
 
 
 import com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig;
-import com.dabsquared.gitlabjenkins.gitlab.api.GitLabApi;
+import com.dabsquared.gitlabjenkins.gitlab.api.GitLabClient;
 import com.dabsquared.gitlabjenkins.gitlab.api.model.BuildState;
 import hudson.init.Terminator;
 import hudson.model.Run;
@@ -86,7 +86,7 @@ public final class GitLabSCMBuildStatusPublisher {
 
         @Override
         public void run() {
-            GitLabApi client = getClient(connectionName);
+            GitLabClient client = getClient(connectionName);
             if (client == null) {
                 LOGGER.log(WARNING, "cannot publish build-status pending as no gitlab-connection is configured!");
             } else {
@@ -98,7 +98,7 @@ public final class GitLabSCMBuildStatusPublisher {
             }
         }
 
-        private GitLabApi getClient(String connectionName) {
+        private GitLabClient getClient(String connectionName) {
             GitLabConnectionConfig config = (GitLabConnectionConfig) Jenkins.getInstance().getDescriptor(GitLabConnectionConfig.class);
             return config != null ? config.getClient(connectionName) : null;
         }

@@ -76,7 +76,7 @@ class SourceActions {
             linkAction = GitLabLinkAction.toMergeRequest(mr.getWebUrl());
             if (acceptMergeRequest(head)) {
                 boolean removeSourceBranch = mr.getRemoveSourceBranch() || removeSourceBranch(head);
-                actions.add(new GitLabSCMAcceptMergeRequestAction(mr.getProjectId(), mr.getId(), mr.getIid(), source.getSourceSettings().getMergeCommitMessage(), removeSourceBranch));
+                actions.add(new GitLabSCMAcceptMergeRequestAction(mr, mr.getIid(), source.getSourceSettings().getMergeCommitMessage(), removeSourceBranch));
             }
         } else {
             linkAction = (head instanceof TagSCMHead) ? GitLabLinkAction.toTag(source.getProject(), head.getName()) : GitLabLinkAction.toBranch(source.getProject(), head.getName());
