@@ -86,7 +86,7 @@ public class GitLabSCMSource extends AbstractGitSCMSource {
 
     @Override
     public String getCredentialsId() {
-        return sourceSettings.getCredentialsId();
+        return sourceSettings.getCheckoutCredentialsId();
     }
 
     @Override

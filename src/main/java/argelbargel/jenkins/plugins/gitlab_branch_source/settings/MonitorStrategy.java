@@ -7,6 +7,7 @@ import hudson.model.Descriptor;
 import hudson.util.ListBoxModel;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 
@@ -26,14 +27,28 @@ public class MonitorStrategy extends AbstractDescribableImpl<MonitorStrategy> {
         return monitor;
     }
 
+    @DataBoundSetter
+    public final void setMonitored(boolean value) {
+        monitor = value;
+    }
+
     public final boolean getBuild() {
         return build;
+    }
+
+    @DataBoundSetter
+    public final void setBuild(boolean value) {
+        build = value;
     }
 
     public final BuildStatusPublishMode getBuildStatusPublishMode() {
         return buildStatusPublishMode;
     }
 
+    @DataBoundSetter
+    public final void setBuildStatusPublishMode(BuildStatusPublishMode value) {
+        buildStatusPublishMode = value;
+    }
 
     protected static abstract class MonitorStrategyDescriptor<T extends MonitorStrategy> extends Descriptor<MonitorStrategy> {
         @Nonnull

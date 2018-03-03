@@ -44,7 +44,7 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
     private final GitLabSCMOriginMonitorStrategy originMonitorStrategy;
     private final GitLabSCMForksMonitorStrategy forksMonitorStrategy;
     private final GitLabSCMTagMonitorStrategy tagMonitorStrategy;
-    private String credentialsId;
+    private String checkoutCredentialsId;
     private boolean updateBuildDescription;
     private boolean publishUnstableBuildsAsSuccess;
     private String mergeCommitMessage;
@@ -70,7 +70,7 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         this.originMonitorStrategy = originMonitorStrategy;
         this.forksMonitorStrategy = forksMonitorStrategy;
         this.tagMonitorStrategy = tagMonitorStrategy;
-        this.credentialsId = CHECKOUT_CREDENTIALS_ANONYMOUS;
+        this.checkoutCredentialsId = CHECKOUT_CREDENTIALS_ANONYMOUS;
         this.updateBuildDescription = true;
         this.publishUnstableBuildsAsSuccess = false;
         this.mergeCommitMessage = DEFAULT_MERGE_COMMIT_MESSAGE;
@@ -97,13 +97,13 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         return tagMonitorStrategy;
     }
 
-    public String getCredentialsId() {
-        return !CHECKOUT_CREDENTIALS_ANONYMOUS.equals(credentialsId) ? credentialsId : null;
+    public String getCheckoutCredentialsId() {
+        return !CHECKOUT_CREDENTIALS_ANONYMOUS.equals(checkoutCredentialsId) ? checkoutCredentialsId : null;
     }
 
     @DataBoundSetter
-    public void setCredentialsId(String credentialsId) {
-        this.credentialsId = credentialsId;
+    public void setCheckoutCredentialsId(String checkoutCredentialsId) {
+        this.checkoutCredentialsId = checkoutCredentialsId;
     }
 
 
