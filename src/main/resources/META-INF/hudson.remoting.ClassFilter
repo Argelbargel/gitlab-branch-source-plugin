@@ -1,0 +1,3 @@
+org.gitlab.api.models.GitlabNamespace
+org.gitlab.api.models.GitlabPermission
+org.gitlab.api.models.GitlabProjectAccessLevel
