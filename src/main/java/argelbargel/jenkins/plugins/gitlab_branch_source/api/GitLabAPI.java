@@ -282,18 +282,18 @@ public final class GitLabAPI {
     }
 
     private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
-        StringBuilder urlBuilder = new StringBuilder(GitlabGroup.URL).append(PATH_SEP).append(group).append(GitLabProject.URL);
+        StringBuilder urlBuilder = new StringBuilder(GitlabGroup.URL).append(PATH_SEP).append(group).append(GitLabProject.URL).append("?membership=true");
 
         if (!VISIBLE.equals(selector)) {
-            urlBuilder.append("?").append(selector.id()).append("=true");
+            urlBuilder.append("&").append(selector.id()).append("=true");
         }
 
         if (!ALL.equals(visibility)) {
-            urlBuilder.append(VISIBLE.equals(selector) ? "?" : "&").append("visibility=").append(visibility.id());
+            urlBuilder.append("&").append("visibility=").append(visibility.id());
         }
 
         if (!StringUtils.isEmpty(searchPattern)) {
-            urlBuilder.append(VISIBLE.equals(selector) && ALL.equals(visibility) ? "?" : "&").append("search=").append(searchPattern);
+            urlBuilder.append("&").append("search=").append(searchPattern);
         }
 
         return urlBuilder.toString();
@@ -302,14 +302,14 @@ public final class GitLabAPI {
 
     private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
         StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL)
-                .append(PATH_SEP).append(selector.id());
+                .append(PATH_SEP).append(selector.id()).append("?membership=true");
 
         if (!ALL.equals(visibility)) {
-            urlBuilder.append("?visibility=").append(visibility.id());
+            urlBuilder.append("&visibility=").append(visibility.id());
         }
 
         if (!StringUtils.isEmpty(searchPattern)) {
-            urlBuilder.append(ALL.equals(visibility) ? "?" : "&").append("search=").append(searchPattern);
+            urlBuilder.append("&").append("search=").append(searchPattern);
         }
 
         return urlBuilder.toString();
