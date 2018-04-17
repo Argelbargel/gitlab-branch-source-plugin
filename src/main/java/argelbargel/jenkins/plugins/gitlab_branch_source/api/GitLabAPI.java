@@ -90,6 +90,7 @@ public final class GitLabAPI {
     public GitlabBranch getBranch(int projectId, String branch) throws GitLabAPIException {
         try {
             String tailUrl = GitlabProject.URL + PATH_SEP + projectId + GitlabBranch.URL + PATH_SEP + URLEncoder.encode(branch, "UTF-8");
+            tailUrl = tailUrl.replaceAll("//", "/");
             return delegate.retrieve().to(tailUrl, GitlabBranch.class);
         } catch (FileNotFoundException e) {
             throw new NoSuchElementException("unknown branch " + branch);
