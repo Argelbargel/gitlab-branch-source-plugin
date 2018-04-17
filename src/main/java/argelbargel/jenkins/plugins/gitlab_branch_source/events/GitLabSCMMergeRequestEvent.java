@@ -21,13 +21,24 @@ import static jenkins.scm.api.SCMEvent.Type.CREATED;
 import static jenkins.scm.api.SCMEvent.Type.REMOVED;
 import static jenkins.scm.api.SCMEvent.Type.UPDATED;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 
 public final class GitLabSCMMergeRequestEvent extends GitLabSCMHeadEvent<MergeRequestHook> {
-    public static GitLabSCMMergeRequestEvent create(String id, MergeRequestHook hook, String origin) {
-        switch (hook.getObjectAttributes().getAction()) {
-            case open:
+    public static GitLabSCMMergeRequestEvent create(String id, MergeRequestHook hook, String action, String origin) {
+              Logger LOGGER = Logger.getLogger(GitLabSCMMergeRequestEvent.class.getName());
+             
+        if(hook.getObjectAttributes().getAction()==null)
+        {
+              LOGGER.warning("hook ObjectAttributes action is null");
+        }
+        switch (action) {
+            case "open":
                 return new GitLabSCMMergeRequestEvent(CREATED, id, hook, origin);
-            case update:
+            case "reopen":
+                return new GitLabSCMMergeRequestEvent(CREATED, id, hook, origin);
+            case "update":
                 return new GitLabSCMMergeRequestEvent(UPDATED, id, hook, origin);
             default:
                 // other actions are "merged" and "closed". in both cases we can remove the head
