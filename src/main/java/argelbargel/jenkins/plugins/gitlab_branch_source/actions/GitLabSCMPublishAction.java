@@ -101,13 +101,7 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
     public void publishResult(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata) {
         Result buildResult = build.getResult();
-        if ((buildResult == SUCCESS) || ((buildResult == UNSTABLE) && markUnstableAsSuccess)) {
-            updateRunningContexts(build, metadata, success);
-        } else if (buildResult == ABORTED) {
-            updateRunningContexts(build, metadata, canceled);
-        } else {
-            updateRunningContexts(build, metadata, failed);
-        }
+        updateRunningContexts(build, metadata, toBuildStateFromResult(buildResult));
     }
 
     private void updateRunningContexts(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata, BuildState state) {
@@ -118,6 +112,16 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
     private void publishBuildStatus(Run<?, ?> run, GitLabSCMHeadMetadataAction metadata, BuildState state, String context, String description) {
         GitLabSCMBuildStatusPublisher.instance().publish(connectionName, run, metadata.getProjectId(), metadata.getHash(), state, metadata.getBranch(), context, description);
+    }
+
+    public BuildState toBuildStateFromResult(final Result result) {
+        if ((result == SUCCESS) || ((result == UNSTABLE) && markUnstableAsSuccess)) {
+            return success;
+        } else if (result == ABORTED) {
+            return canceled;
+        } else {
+            return failed;
+        }
     }
 
     private final class GitLabSCMGraphListener implements GraphListener {
@@ -133,9 +137,24 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
         @Override
         public void onNewHead(FlowNode node) {
             if (isNamedStageStartNode(node)) {
+
                 publishBuildStatus(build, metadata, running, getRunningContexts().push(node), "");
+
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
-                publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
+
+                // If this or a prior stage failed then build.result is set to 'FAILED'
+                // otherwise build.result is still null and we assume success.
+                BuildState state = success;
+                if(build.getResult() != null) {
+                    state = toBuildStateFromResult(build.getResult());
+                }
+                // If there is an exception of some kind in Jenkins, the node will contain
+                // an error and we publish this stage as failed.
+                if(node.getError() != null) {
+                    state = failed;
+                }
+                String context = getRunningContexts().pop();
+                publishBuildStatus(build, metadata, state, context, "");
             }
         }
 
