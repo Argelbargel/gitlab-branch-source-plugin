@@ -39,8 +39,13 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRe
 import static hudson.model.TaskListener.NULL;
 import static java.util.Collections.emptyMap;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 
 class SourceHeads {
+
+    private static final Logger LOGGER = Logger.getLogger(SourceHeads.class.getName());
     private static final SCMHeadObserver NOOP_OBSERVER = new SCMHeadObserver() {
         @Override
         public void observe(@Nonnull jenkins.scm.api.SCMHead head, @Nonnull SCMRevision revision) { /* NOOP */ }
@@ -119,11 +124,6 @@ class SourceHeads {
             } catch (NoSuchElementException e) {
                 log(listener, Messages.GitLabSCMSource_removedMergeRequest(mrId));
                 branchesWithMergeRequests(listener).remove(mrId);
-            }
-
-            int sourceProjectId = attributes.getSourceProjectId();
-            if (sourceProjectId == source.getProjectId()) {
-                observe(criteria, observer, createBranch(source.getProjectId(), attributes.getSourceBranch(), attributes.getLastCommit().getId()), listener);
             }
         }
     }
@@ -238,7 +238,6 @@ class SourceHeads {
                 mergeRequest.getIid(),
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
                 createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)), Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
-
         if (source.getSourceSettings().buildUnmerged(head)) {
             observe(criteria, observer, head, listener);
         }
