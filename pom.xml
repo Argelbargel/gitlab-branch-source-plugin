@@ -133,6 +133,14 @@
 			<version>2.0.5</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Fix NoClassDefFoundError org/jenkinsci/plugins/workflow/steps/SynchronousStepExecution on startup -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-step-api</artifactId>
+			<version>2.15</version>
+			<scope>test</scope>
+		</dependency>
+		
         <!-- TODO: i'd like to have those for local development but not when building with travis...
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
