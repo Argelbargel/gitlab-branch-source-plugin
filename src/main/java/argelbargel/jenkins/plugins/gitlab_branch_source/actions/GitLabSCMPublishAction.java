@@ -101,11 +101,15 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
     public void publishResult(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata) {
         Result buildResult = build.getResult();
+
         if ((buildResult == SUCCESS) || ((buildResult == UNSTABLE) && markUnstableAsSuccess)) {
+
             updateRunningContexts(build, metadata, success);
         } else if (buildResult == ABORTED) {
+
             updateRunningContexts(build, metadata, canceled);
         } else {
+
             updateRunningContexts(build, metadata, failed);
         }
     }
@@ -135,7 +139,14 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
             if (isNamedStageStartNode(node)) {
                 publishBuildStatus(build, metadata, running, getRunningContexts().push(node), "");
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
-                publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
+                Result buildResult = build.getResult();
+                if(buildResult==UNSTABLE ) {
+                    publishBuildStatus(build, metadata,failed, getRunningContexts().pop(), "");
+                }
+                else
+                {
+                    publishBuildStatus(build, metadata, success, getRunningContexts().pop(), "");
+                }
             }
         }
 

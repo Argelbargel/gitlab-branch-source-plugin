@@ -116,7 +116,7 @@ class SourceHeads {
         String targetBranch = attributes.getTargetBranch();
 
         if (!source.isExcluded(targetBranch)) {
-            int mrId = attributes.getId();
+            int mrId = attributes.getIid();
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequest(mrId));
             try {
                 GitLabMergeRequest mr = api().getMergeRequest(source.getProjectId(), mrId);
@@ -233,7 +233,7 @@ class SourceHeads {
 
         String targetBranch = mergeRequest.getTargetBranch();
         GitLabSCMMergeRequestHead head = createMergeRequest(
-                mergeRequest.getId(),
+                mergeRequest.getIid(),
                 mergeRequest.getTitle(),
                 mergeRequest.getIid(),
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
@@ -250,7 +250,7 @@ class SourceHeads {
         }
 
         if (!source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests() && head.fromOrigin()) {
-            branchesWithMergeRequests(listener).put(mergeRequest.getId(), mergeRequest.getSourceBranch());
+            branchesWithMergeRequests(listener).put(mergeRequest.getIid(), mergeRequest.getSourceBranch());
         }
     }
 
