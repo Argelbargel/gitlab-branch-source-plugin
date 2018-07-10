@@ -1,5 +1,7 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.api;
 
+import hudson.ProxyConfiguration;
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.http.Query;
@@ -16,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -34,6 +37,10 @@ public final class GitLabAPI {
         try {
             GitlabAPI delegate = GitlabAPI.connect(url, token);
             delegate.ignoreCertificateErrors(ignoreCertificateErrors);
+            ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+            if (proxy != null) {
+                delegate.proxy(proxy.createProxy(url));
+            }
             return new GitLabAPI(delegate);
         } catch (Exception e) {
             throw new GitLabAPIException(e);
