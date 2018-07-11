@@ -85,7 +85,7 @@ public final class GitLabSCMNoteEvent extends GitLabSCMHeadEvent<NoteHook> {
                 createBranch(sourceProjectId, sourceBranch, hash),
                 createBranch(attributes.getTargetProjectId(), attributes.getTargetBranch(), REVISION_HEAD));
 
-        Logger.getLogger(GitLabSCMNoteEvent.class.getName()).severe("key area  sourceid: " + source.getId() + " branch id:" +source.getpro);
+        Logger.getLogger(GitLabSCMNoteEvent.class.getName()).severe("key area  sourceid: " + source.getId() + " branch id:");
         if (source.getSourceSettings().buildUnmerged(head)) {
             heads.add(head);
         }
