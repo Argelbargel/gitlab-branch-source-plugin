@@ -130,42 +130,7 @@ class SourceHeads {
     private void retrieveMergeRequest(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull GitLabSCMNoteEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         MergeRequestObjectAttributes attributes = event.getPayload().getMergeRequest();
         String targetBranch = attributes.getTargetBranch();
-        log(listener,"my project is: "+source.getProjectId());
-        try {
-            try {
-                java.lang.reflect.Field f = observer.getClass().getDeclaredField("source"); //NoSuchFieldException
-                f.setAccessible(true);
-                SCMSource iWantThis = (SCMSource) f.get(observer); //IllegalAccessException
-                java.lang.reflect.Field f2 = observer.getClass().getDeclaredField("origBranch"); //NoSuchFieldException
-                f2.setAccessible(true);
-                jenkins.branch.Branch iWantThis2 = (jenkins.branch.Branch) f2.get(observer); //IllegalAccessException
-
-
-                log(listener, "sourceid: " + iWantThis.getId() + " origBranch: " + iWantThis2.getSourceId());
-            }
-            catch (java.lang.IllegalAccessException e)
-            {
-
-                log(listener,"IllegalException was caught" + e.getMessage());
-            }
-        }
-        catch (java.lang.NoSuchFieldException e)
-        {
-            log(listener,"NoSuchFieldException was caught" + e.getMessage());
-        }
-        if (!source.isExcluded(targetBranch)) {
-            int mrId = attributes.getIid();
-            log(listener, Messages.GitLabSCMSource_retrievingMergeRequest(mrId));
-            try {
-                GitLabMergeRequest mr = api().getMergeRequest(source.getProjectId(), mrId);
-             //   log(listener,branch
-              //  ParameterizedJobMixIn.scheduleBuild2()
-                        observe(criteria, observer, mr, listener);
-            } catch (NoSuchElementException e) {
-                log(listener, Messages.GitLabSCMSource_removedMergeRequest(mrId));
-                branchesWithMergeRequests(listener).remove(mrId);
-            }
-        }
+        
     }
 
     private void retrieveBranch(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull GitLabSCMPushEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
@@ -278,7 +243,6 @@ class SourceHeads {
                 mergeRequest.getIid(),
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
                 createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)), Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
-
         if (source.getSourceSettings().buildUnmerged(head)) {
 
             observe(criteria, observer, head, listener);

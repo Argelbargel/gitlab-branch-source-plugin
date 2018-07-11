@@ -1,162 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>2.20</version>
-        <relativePath />
-    </parent>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>2.20</version>
+		<relativePath />
+	</parent>
 
-    <properties>
+	<properties>
         <jenkins.version>2.7.1</jenkins.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 	   <java.level>8</java.level>
-    </properties>
+	</properties>
 
-    <groupId>argelbargel.jenkins.plugins</groupId>
-    <artifactId>gitlab-branch-source</artifactId>
-    <version>DEV-SNAPSHOT</version>
+	<groupId>argelbargel.jenkins.plugins</groupId>
+	<artifactId>gitlab-branch-source</artifactId>
+	<version>DEV-SNAPSHOT</version>
 
-    <packaging>hpi</packaging>
-    <name>GitLab Branch Source Plugin</name>
-    <url>https://github.com/Argelbargel/gitlab-branch-source-plugin</url>
-    <description>Multibranch projects and organization folders from GitLab</description>
+	<packaging>hpi</packaging>
+	<name>GitLab Branch Source Plugin</name>
+	<url>https://github.com/Argelbargel/gitlab-branch-source-plugin</url>
+	<description>Multibranch projects and organization folders from GitLab</description>
 
-    <licenses>
-        <license>
-            <name>GPL v2.0 License</name>
-            <url>http://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>GPL v2.0 License</name>
+			<url>http://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html</url>
+		</license>
+	</licenses>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>branch-api</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>branch-api</artifactId>
             <version>2.0.20</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>cloudbees-folder</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>cloudbees-folder</artifactId>
             <version>6.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>credentials</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>credentials</artifactId>
             <version>2.1.16</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>git</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>git</artifactId>
             <version>3.9.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>git-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>git-client</artifactId>
             <version>2.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>gitlab-plugin</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>scm-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>gitlab-plugin</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>scm-api</artifactId>
             <version>2.2.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-api</artifactId>
             <version>2.27</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-cps</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-cps</artifactId>
             <version>2.53</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-job</artifactId>
-            <version>2.11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-multibranch</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-job</artifactId>
+			<version>2.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-multibranch</artifactId>
             <version>2.19</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gitlab</groupId>
-            <artifactId>java-gitlab-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.gitlab</groupId>
+			<artifactId>java-gitlab-api</artifactId>
             <version>4.0.0</version>
-        </dependency>
+		</dependency>
 
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>pipeline-stage-step</artifactId>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>pipeline-stage-step</artifactId>
             <version>2.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-basic-steps</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-basic-steps</artifactId>
             <version>2.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-durable-task-step</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-durable-task-step</artifactId>
             <version>2.19</version>
-            <scope>test</scope>
-        </dependency>
+			<scope>test</scope>
+		</dependency>
 
-        <!-- without this the build fails because of cyclic-dependencies -->
+		<!-- without this the build fails because of cyclic-dependencies -->
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-scm-step</artifactId>
+            <version>2.6</version>
+		</dependency>
+
+		<!-- by default 1.4 is installed which causes an StackOverflowError -->
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>structs</artifactId>
+            <version>1.14</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>github-branch-source</artifactId>
+                    <version>2.3.6</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Fix NoClassDefFoundError org/jenkinsci/plugins/workflow/steps/SynchronousStepExecution on startup -->
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
-            <artifactId>workflow-scm-step</artifactId>
-            <version>2.6</version>
-        </dependency>
-
-        <!-- by default 1.4 is installed which causes an StackOverflowError -->
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>structs</artifactId>
-            <version>1.14</version>
-            <scope>test</scope>
-        </dependency>
-
-
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>github-branch-source</artifactId>
-                    <version>2.3.6</version>
-                    <scope>test</scope>
-                </dependency>
+			<artifactId>workflow-step-api</artifactId>
+			<version>2.15</version>
+			<scope>test</scope>
+		</dependency>
+		
         <!-- TODO: i'd like to have those for local development but not when building with travis...
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>timestamper</artifactId>
-                    <version>1.8.8</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.sonyericsson.hudson.plugins.rebuild</groupId>
-                    <artifactId>rebuild</artifactId>
-                    <version>1.25</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins.workflow</groupId>
-                    <artifactId>workflow-aggregator</artifactId>
-                    <version>2.5</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins.workflow</groupId>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>timestamper</artifactId>
+			<version>1.8.8</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sonyericsson.hudson.plugins.rebuild</groupId>
+			<artifactId>rebuild</artifactId>
+			<version>1.25</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-aggregator</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
                     <artifactId>workflow-basic-steps</artifactId>
                     <version>2.4</version>
                     <scope>test</scope>
@@ -169,104 +175,185 @@
                 </dependency>
                 <dependency>
                     <groupId>org.jenkins-ci.plugins.workflow</groupId>
-                    <artifactId>workflow-step-api</artifactId>
-                    <version>2.7</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>pipeline-build-step</artifactId>
-                    <version>2.4</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>pipeline-input-step</artifactId>
-                    <version>2.5</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins.workflow</groupId>
-                    <artifactId>workflow-cps-global-lib</artifactId>
-                    <version>2.5</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.jenkins-ci.plugins</groupId>
-                    <artifactId>pipeline-milestone-step</artifactId>
-                    <version>1.3</version>
-                    <scope>test</scope>
-                </dependency>
+			<artifactId>workflow-step-api</artifactId>
+			<version>2.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>pipeline-build-step</artifactId>
+			<version>2.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>pipeline-input-step</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-cps-global-lib</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>pipeline-milestone-step</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
+		</dependency>
         -->
-    </dependencies>
+	</dependencies>
 
-    <repositories>
-        <repository>
-            <id>1_jenkins-releases</id>
-            <url>http://repo.jenkins-ci.org/releases/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>1_jenkins-releases</id>
-            <url>http://repo.jenkins-ci.org/releases/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>svg-rasterizer-maven-plugin-mvn-repo</id>
-            <url>https://raw.githubusercontent.com/Argelbargel/svg-rasterizer-maven-plugin/mvn-repo/</url>
-        </pluginRepository>
-    </pluginRepositories>
+	<repositories>
+		<repository>
+			<id>1_jenkins-releases</id>
+			<url>http://repo.jenkins-ci.org/releases/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>1_jenkins-releases</id>
+			<url>http://repo.jenkins-ci.org/releases/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>svg-rasterizer-maven-plugin-mvn-repo</id>
+			<url>https://raw.githubusercontent.com/Argelbargel/svg-rasterizer-maven-plugin/mvn-repo/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>argelbargel.maven</groupId>
-                <artifactId>svg-rasterizer-maven-plugin</artifactId>
-                <version>1.0.1-RELEASE</version>
-                <executions>
-                    <execution>
-                        <id>Rasterize icons</id>
-                        <goals>
-                            <goal>rasterize-directory</goal>
-                        </goals>
-                        <configuration>
-                            <inputDir>src/main/images</inputDir>
-                            <destDir>src/main/webapp/images</destDir>
-                            <defaults>
-                                <path>{width}x{height}/{name}{ext}</path>
-                                <format>png</format>
-                            </defaults>
-                            <outputs>
-                                <output>
-                                    <width>48</width>
-                                    <height>48</height>
-                                </output>
-                                <output>
-                                    <width>32</width>
-                                    <height>32</height>
-                                </output>
-                                <output>
-                                    <width>24</width>
-                                    <height>24</height>
-                                </output>
-                                <output>
-                                    <width>16</width>
-                                    <height>16</height>
-                                </output>
-                            </outputs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jenkins-ci.tools</groupId>
-                <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.121</version>
-                <configuration>
-                    <compatibleSinceVersion>2.7.1</compatibleSinceVersion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>argelbargel.maven</groupId>
+				<artifactId>svg-rasterizer-maven-plugin</artifactId>
+				<version>1.0.1-RELEASE</version>
+				<executions>
+					<execution>
+						<id>Rasterize icons</id>
+						<goals>
+							<goal>rasterize-directory</goal>
+						</goals>
+						<configuration>
+							<inputDir>src/main/images</inputDir>
+							<destDir>src/main/webapp/images</destDir>
+							<defaults>
+								<path>{width}x{height}/{name}{ext}</path>
+								<format>png</format>
+							</defaults>
+							<outputs>
+								<output>
+									<width>48</width>
+									<height>48</height>
+								</output>
+								<output>
+									<width>32</width>
+									<height>32</height>
+								</output>
+								<output>
+									<width>24</width>
+									<height>24</height>
+								</output>
+								<output>
+									<width>16</width>
+									<height>16</height>
+								</output>
+							</outputs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jenkins-ci.tools</groupId>
+				<artifactId>maven-hpi-plugin</artifactId>
+				<version>1.121</version>
+				<configuration>
+					<compatibleSinceVersion>2.7.1</compatibleSinceVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<!--This plugin's configuration is used to store Eclipse m2e settings 
+							only. It has no influence on the Maven build itself. -->
+						<plugin>
+							<groupId>org.eclipse.m2e</groupId>
+							<artifactId>lifecycle-mapping</artifactId>
+							<version>1.0.0</version>
+							<configuration>
+								<lifecycleMappingMetadata>
+									<pluginExecutions>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>argelbargel.maven</groupId>
+												<artifactId>svg-rasterizer-maven-plugin</artifactId>
+												<versionRange>[1.0.1-RELEASE,)</versionRange>
+												<goals>
+													<goal>rasterize-directory</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<execute />
+											</action>
+										</pluginExecution>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>org.apache.maven.plugins</groupId>
+												<artifactId>maven-enforcer-plugin</artifactId>
+												<versionRange>[0.0.1,)</versionRange>
+												<goals>
+													<goal>enforce</goal>
+													<goal>display-info</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<ignore />
+											</action>
+										</pluginExecution>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>org.apache.maven.plugins</groupId>
+												<artifactId>maven-javadoc-plugin</artifactId>
+												<versionRange>[2.10.1,)</versionRange>
+												<goals>
+													<goal>javadoc</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<ignore />
+											</action>
+										</pluginExecution>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>org.codehaus.gmaven</groupId>
+												<artifactId>gmaven-plugin</artifactId>
+												<versionRange>[0.0.1,)</versionRange>
+												<goals>
+													<goal>generateTestStubs</goal>
+													<goal>testCompile</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<execute />
+											</action>
+										</pluginExecution>
+									</pluginExecutions>
+								</lifecycleMappingMetadata>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
 </project>
