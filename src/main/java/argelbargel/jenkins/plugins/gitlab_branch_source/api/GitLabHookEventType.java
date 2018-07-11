@@ -8,7 +8,8 @@ public enum GitLabHookEventType {
     MERGE_REQUEST("Merge Request Hook"),
     PUSH("Push Hook"),
     SYSTEM_HOOK("System Hook"),
-    TAG_PUSH("Tag Push Hook");
+    TAG_PUSH("Tag Push Hook"),
+    NOTE("Note Hook");
 
     public static GitLabHookEventType byHeader(String header) {
         if (StringUtils.isBlank(header)) {
