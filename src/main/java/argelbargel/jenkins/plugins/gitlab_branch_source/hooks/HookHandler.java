@@ -3,13 +3,11 @@ package argelbargel.jenkins.plugins.gitlab_branch_source.hooks;
 
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabHookEventType;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.SystemHook;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMMergeRequestEvent;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMPushEvent;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMSourceEvent;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMTagPushEvent;
+import argelbargel.jenkins.plugins.gitlab_branch_source.events.*;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestHook;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.PushHook;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.WebHook;
+import com.dabsquared.gitlabjenkins.gitlab.hook.model.NoteHook;
 import com.dabsquared.gitlabjenkins.util.JsonUtil;
 import hudson.util.IOUtils;
 import jenkins.scm.api.SCMHeadEvent;
@@ -54,6 +52,9 @@ class HookHandler {
                     break;
                 case SYSTEM_HOOK:
                     handleSystemHook(id, request,requestBody);
+                    break;
+                case NOTE:
+                    SCMHeadEvent.fireNow(GitLabSCMNoteEvent.create(id, readHook(NoteHook.class, requestBody), originOf(request)));
                     break;
                 default:
                     LOGGER.warning("ignoring hook: " + eventType);

@@ -7,76 +7,75 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequ
 import com.dabsquared.gitlabjenkins.cause.CauseData;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestHook;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestObjectAttributes;
+import com.dabsquared.gitlabjenkins.gitlab.hook.model.NoteHook;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.events.CauseDataHelper.buildCauseData;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.REVISION_HEAD;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createBranch;
-import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.createMergeRequest;
-import static jenkins.scm.api.SCMEvent.Type.CREATED;
-import static jenkins.scm.api.SCMEvent.Type.REMOVED;
-import static jenkins.scm.api.SCMEvent.Type.UPDATED;
-
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead.*;
+import static jenkins.scm.api.SCMEvent.Type.*;
 
 
-public final class GitLabSCMMergeRequestEvent extends GitLabSCMHeadEvent<MergeRequestHook> {
-    public static GitLabSCMMergeRequestEvent create(String id, MergeRequestHook hook, String action, String origin) {
-              Logger LOGGER = Logger.getLogger(GitLabSCMMergeRequestEvent.class.getName());
-             
-        if(hook.getObjectAttributes().getAction()==null)
+public final class GitLabSCMNoteEvent extends GitLabSCMHeadEvent<NoteHook> {
+    public static GitLabSCMNoteEvent create(String id, NoteHook hook, String origin) {
+           //   Logger LOGGER = Logger.getLogger(GitLabSCMNoteEvent.class.getName());
+
+
+        if(hook.getObjectAttributes().getNote().equalsIgnoreCase("jenkins retry"))
         {
-              LOGGER.warning("hook ObjectAttributes action is null");
+            if(hook.getMergeRequest()!=null)
+            {
+                return new GitLabSCMNoteEvent(CREATED, id, hook, origin);
+            }
         }
-        switch (action) {
-            case "open":
-                return new GitLabSCMMergeRequestEvent(CREATED, id, hook, origin);
-            case "reopen":
-                return new GitLabSCMMergeRequestEvent(CREATED, id, hook, origin);
-            case "update":
-                return new GitLabSCMMergeRequestEvent(UPDATED, id, hook, origin);
-            default:
-                // other actions are "merged" and "closed". in both cases we can remove the head
-                return new GitLabSCMMergeRequestEvent(REMOVED, id, hook, origin);
-        }
+
+        return null;
+
     }
 
-    private GitLabSCMMergeRequestEvent(Type type, String id, MergeRequestHook payload, String origin) {
+    private GitLabSCMNoteEvent(Type type, String id, NoteHook payload, String origin) {
         super(type, id, payload, origin);
     }
 
     @Override
     CauseData getCauseData() {
+        Logger.getLogger(GitLabSCMNoteEvent.class.getName()).severe("Note GetCauseData");
         return buildCauseData(getPayload());
     }
 
     @Override
     protected boolean isMatch(@Nonnull GitLabSCMSource source) {
+
+        Logger.getLogger(GitLabSCMNoteEvent.class.getName()).severe("Note ISMatch");
         if (!super.isMatch(source) || !isOrigin(source, getAttributes().getTargetProjectId())) {
+
+            Logger.getLogger(GitLabSCMNoteEvent.class.getName()).severe("Note ISMatch returning false");
             return false;
         }
 
         boolean isOrigin = isOrigin(source, getAttributes().getSourceProjectId());
-        return ((isOrigin && source.getSourceSettings().getOriginMonitorStrategy().getMonitored()) || (!isOrigin && source.getSourceSettings().getForksMonitorStrategy().getMonitored()));
+        boolean rData= ((isOrigin && source.getSourceSettings().getOriginMonitorStrategy().getMonitored()) || (!isOrigin && source.getSourceSettings().getForksMonitorStrategy().getMonitored()));
+
+
+        return rData;
     }
 
     private boolean isOrigin(@Nonnull GitLabSCMSource source, Integer projectId) {
+
         return projectId.equals(source.getProjectId());
     }
 
     private MergeRequestObjectAttributes getAttributes() {
-        return getPayload().getObjectAttributes();
+        return getPayload().getMergeRequest();
     }
 
     @Override
     Collection<? extends GitLabSCMHead> heads(@Nonnull GitLabSCMSource source) throws IOException, InterruptedException {
         Collection<GitLabSCMHead> heads = new ArrayList<>();
-
         MergeRequestObjectAttributes attributes = getAttributes();
         Integer sourceProjectId = attributes.getSourceProjectId();
         String sourceBranch = attributes.getSourceBranch();
@@ -86,6 +85,7 @@ public final class GitLabSCMMergeRequestEvent extends GitLabSCMHeadEvent<MergeRe
                 createBranch(sourceProjectId, sourceBranch, hash),
                 createBranch(attributes.getTargetProjectId(), attributes.getTargetBranch(), REVISION_HEAD));
 
+        Logger.getLogger(GitLabSCMNoteEvent.class.getName()).severe("key area  sourceid: " + source.getId() + " branch id:");
         if (source.getSourceSettings().buildUnmerged(head)) {
             heads.add(head);
         }

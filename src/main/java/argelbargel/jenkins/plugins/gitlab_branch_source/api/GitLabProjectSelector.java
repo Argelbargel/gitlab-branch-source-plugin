@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 public enum GitLabProjectSelector {
     OWNED("owned"),
     STARRED("starred"),
-    VISIBLE("visible");
+    VISIBLE("");
 
     public static GitLabProjectSelector byId(String id) {
         for (GitLabProjectSelector value : values()) {

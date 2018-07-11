@@ -102,6 +102,9 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
     public void publishResult(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata) {
         Result buildResult = build.getResult();
         updateRunningContexts(build, metadata, toBuildStateFromResult(buildResult));
+
+
+
     }
 
     private void updateRunningContexts(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata, BuildState state) {
@@ -142,7 +145,7 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
 
-                // If this or a prior stage failed then build.result is set to 'FAILED'
+                 // If this or a prior stage failed then build.result is set to 'FAILED'
                 // otherwise build.result is still null and we assume success.
                 BuildState state = success;
                 if(build.getResult() != null) {

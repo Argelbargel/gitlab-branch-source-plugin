@@ -1,11 +1,11 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source;
 
-
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPI;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabMergeRequest;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.filters.GitLabMergeRequestFilter;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMMergeRequestEvent;
+import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMNoteEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMPushEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMTagPushEvent;
 import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMHead;
@@ -13,12 +13,10 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequ
 import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMTagHead;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestObjectAttributes;
 import hudson.model.TaskListener;
+import jenkins.branch.MultiBranchProject;
+import jenkins.model.ParameterizedJobMixIn;
 import jenkins.plugins.git.AbstractGitSCMSource.SCMRevisionImpl;
-import jenkins.scm.api.SCMHead;
-import jenkins.scm.api.SCMHeadEvent;
-import jenkins.scm.api.SCMHeadObserver;
-import jenkins.scm.api.SCMRevision;
-import jenkins.scm.api.SCMSourceCriteria;
+import jenkins.scm.api.*;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabTag;
 
@@ -70,6 +68,8 @@ class SourceHeads {
     void retrieve(@CheckForNull SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @CheckForNull SCMHeadEvent<?> event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         if (event instanceof GitLabSCMMergeRequestEvent) {
             retrieveMergeRequest(criteria, observer, (GitLabSCMMergeRequestEvent) event, listener);
+        } else if (event instanceof GitLabSCMNoteEvent) {
+            retrieveMergeRequest(criteria, observer, (GitLabSCMNoteEvent) event, listener);
         } else if (event instanceof GitLabSCMTagPushEvent) {
             retrieveTag(criteria, observer, (GitLabSCMTagPushEvent) event, listener);
         } else if (event instanceof GitLabSCMPushEvent) {
@@ -116,7 +116,7 @@ class SourceHeads {
         String targetBranch = attributes.getTargetBranch();
 
         if (!source.isExcluded(targetBranch)) {
-            int mrId = attributes.getId();
+            int mrId = attributes.getIid();
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequest(mrId));
             try {
                 GitLabMergeRequest mr = api().getMergeRequest(source.getProjectId(), mrId);
@@ -126,6 +126,11 @@ class SourceHeads {
                 branchesWithMergeRequests(listener).remove(mrId);
             }
         }
+    }
+    private void retrieveMergeRequest(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull GitLabSCMNoteEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
+        MergeRequestObjectAttributes attributes = event.getPayload().getMergeRequest();
+        String targetBranch = attributes.getTargetBranch();
+        
     }
 
     private void retrieveBranch(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, @Nonnull GitLabSCMPushEvent event, @Nonnull TaskListener listener) throws IOException, InterruptedException {
@@ -233,12 +238,13 @@ class SourceHeads {
 
         String targetBranch = mergeRequest.getTargetBranch();
         GitLabSCMMergeRequestHead head = createMergeRequest(
-                mergeRequest.getId(),
+                mergeRequest.getIid(),
                 mergeRequest.getTitle(),
                 mergeRequest.getIid(),
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
                 createBranch(mergeRequest.getTargetProjectId(), targetBranch, retrieveBranchRevision(targetBranch)), Objects.equals(mergeRequest.getMergeStatus(), CAN_BE_MERGED));
         if (source.getSourceSettings().buildUnmerged(head)) {
+
             observe(criteria, observer, head, listener);
         }
 
@@ -250,12 +256,15 @@ class SourceHeads {
         }
 
         if (!source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests() && head.fromOrigin()) {
-            branchesWithMergeRequests(listener).put(mergeRequest.getId(), mergeRequest.getSourceBranch());
+            branchesWithMergeRequests(listener).put(mergeRequest.getIid(), mergeRequest.getSourceBranch());
         }
     }
 
     private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitLabSCMHead head, TaskListener listener) throws IOException, InterruptedException {
+
         if (criteria == null || matches(criteria, head, listener)) {
+
+
             observer.observe(head, head.getRevision());
         }
     }

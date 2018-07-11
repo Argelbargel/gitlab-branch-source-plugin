@@ -188,10 +188,11 @@ public final class GitLabAPI {
         try {
             Query query = new Query()
                     .appendIf("path", path)
-                    .appendIf("ref_name", ref);
+                    .appendIf("ref", ref);
 
-
+            query.append("per_page","10000");
             String tailUrl = GitlabProject.URL + "/" + id + "/repository" + GitlabRepositoryTree.URL + query.toString();
+            LOGGER.fine("tailurl: " + tailUrl);
             GitlabRepositoryTree[] tree = delegate.retrieve().to(tailUrl, GitlabRepositoryTree[].class);
             return Arrays.asList(tree);
         } catch (Exception e) {
