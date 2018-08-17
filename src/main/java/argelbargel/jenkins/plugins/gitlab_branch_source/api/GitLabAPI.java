@@ -188,10 +188,11 @@ public final class GitLabAPI {
         try {
             Query query = new Query()
                     .appendIf("path", path)
-                    .appendIf("ref_name", ref);
+                    .appendIf("ref", ref);
 
-
+            query.append("per_page","10000");
             String tailUrl = GitlabProject.URL + "/" + id + "/repository" + GitlabRepositoryTree.URL + query.toString();
+            LOGGER.fine("tailurl: " + tailUrl);
             GitlabRepositoryTree[] tree = delegate.retrieve().to(tailUrl, GitlabRepositoryTree[].class);
             return Arrays.asList(tree);
         } catch (Exception e) {
@@ -278,41 +279,35 @@ public final class GitLabAPI {
                 return true;
             }
         }
-
         return false;
     }
 
     private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
         StringBuilder urlBuilder = new StringBuilder(GitlabGroup.URL).append(PATH_SEP).append(group).append(GitLabProject.URL).append("?membership=true");
-
         if (!VISIBLE.equals(selector)) {
             urlBuilder.append("&").append(selector.id()).append("=true");
         }
-
         if (!ALL.equals(visibility)) {
-            urlBuilder.append("&").append("visibility=").append(visibility.id());
+            urlBuilder.append("&visibility=").append(visibility.id());
         }
-
         if (!StringUtils.isEmpty(searchPattern)) {
-            urlBuilder.append("&").append("search=").append(searchPattern);
+            urlBuilder.append("&search=").append(searchPattern);
         }
-
         return urlBuilder.toString();
     }
 
 
     private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
-        StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL)
-                .append(PATH_SEP).append(selector.id()).append("?membership=true");
-
+        StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL).append("?membership=true");
+        if (!VISIBLE.equals(selector)) {
+            urlBuilder.append("&").append(selector.id()).append("=true");
+        }
         if (!ALL.equals(visibility)) {
             urlBuilder.append("&visibility=").append(visibility.id());
         }
-
         if (!StringUtils.isEmpty(searchPattern)) {
-            urlBuilder.append("&").append("search=").append(searchPattern);
+            urlBuilder.append("&search=").append(searchPattern);
         }
-
         return urlBuilder.toString();
     }
 
@@ -323,4 +318,5 @@ public final class GitLabAPI {
             throw new GitLabAPIException(e);
         }
     }
+
 }

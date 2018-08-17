@@ -1,6 +1,5 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source;
 
-
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPI;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabAPIException;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabMergeRequest;
@@ -13,12 +12,10 @@ import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMMergeRequ
 import argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMTagHead;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestObjectAttributes;
 import hudson.model.TaskListener;
+import jenkins.branch.MultiBranchProject;
+import jenkins.model.ParameterizedJobMixIn;
 import jenkins.plugins.git.AbstractGitSCMSource.SCMRevisionImpl;
-import jenkins.scm.api.SCMHead;
-import jenkins.scm.api.SCMHeadEvent;
-import jenkins.scm.api.SCMHeadObserver;
-import jenkins.scm.api.SCMRevision;
-import jenkins.scm.api.SCMSourceCriteria;
+import jenkins.scm.api.*;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabTag;
 
@@ -116,7 +113,7 @@ class SourceHeads {
         String targetBranch = attributes.getTargetBranch();
 
         if (!source.isExcluded(targetBranch)) {
-            int mrId = attributes.getId();
+            int mrId = attributes.getIid();
             log(listener, Messages.GitLabSCMSource_retrievingMergeRequest(mrId));
             try {
                 GitLabMergeRequest mr = api().getMergeRequest(source.getProjectId(), mrId);
@@ -230,10 +227,9 @@ class SourceHeads {
 
     private void observe(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, GitLabMergeRequest mergeRequest, @Nonnull TaskListener listener) throws IOException, InterruptedException {
         log(listener, Messages.GitLabSCMSource_monitoringMergeRequest(mergeRequest.getIid()));
-
         String targetBranch = mergeRequest.getTargetBranch();
         GitLabSCMMergeRequestHead head = createMergeRequest(
-                mergeRequest.getId(),
+                mergeRequest.getIid(),
                 mergeRequest.getTitle(),
                 mergeRequest.getIid(),
                 createBranch(mergeRequest.getSourceProjectId(), mergeRequest.getSourceBranch(), mergeRequest.getSha()),
@@ -241,16 +237,14 @@ class SourceHeads {
         if (source.getSourceSettings().buildUnmerged(head)) {
             observe(criteria, observer, head, listener);
         }
-
         if (source.getSourceSettings().buildMerged(head)) {
             if (!head.isMergeable() && buildOnlyMergeableRequests(head)) {
                 log(listener, Messages.GitLabSCMSource_willNotBuildUnmergeableRequest(mergeRequest.getIid(), mergeRequest.getTargetBranch(), mergeRequest.getMergeStatus()));
             }
             observe(criteria, observer, head.merged(), listener);
         }
-
         if (!source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests() && head.fromOrigin()) {
-            branchesWithMergeRequests(listener).put(mergeRequest.getId(), mergeRequest.getSourceBranch());
+            branchesWithMergeRequests(listener).put(mergeRequest.getIid(), mergeRequest.getSourceBranch());
         }
     }
 
@@ -272,7 +266,6 @@ class SourceHeads {
         } catch (IOException e) {
             log(listener, "error checking criteria: " + e.getMessage());
         }
-
         return false;
     }
 
@@ -288,11 +281,9 @@ class SourceHeads {
         if (source.getSourceSettings().getBranchMonitorStrategy().getBuildBranchesWithMergeRequests()) {
             return emptyMap();
         }
-
         if (branchesWithMergeRequestsCache == null) {
             retrieveMergeRequests(ALL_CRITERIA, NOOP_OBSERVER, listener);
         }
-
         return branchesWithMergeRequestsCache;
     }
 
@@ -304,7 +295,6 @@ class SourceHeads {
                     source.getSourceSettings().getOriginMonitorStrategy().getBuildOnlyMergeableMerged(),
                     source.getSourceSettings().getForksMonitorStrategy().getBuildOnlyMergeableMerged());
         }
-
         return true;
     }
 

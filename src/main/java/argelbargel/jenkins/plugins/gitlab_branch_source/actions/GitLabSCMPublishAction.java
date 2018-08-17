@@ -84,19 +84,20 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
     private void attachGraphListener(final WorkflowRun build, final GraphListener listener) {
         build.getExecutionPromise().addListener(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        build.addAction(new RunningContextsAction());
-                        FlowExecution execution = build.getExecution();
-                        if (execution != null) {
-                            execution.addListener(listener);
-                        } else {
-                            LOGGER.log(SEVERE, "could not get flow-execution for build " + build.getFullDisplayName());
-                        }
+            new Runnable() {
+                @Override
+                public void run() {
+                    build.addAction(new RunningContextsAction());
+                    FlowExecution execution = build.getExecution();
+                    if (execution != null) {
+                        execution.addListener(listener);
+                    } else {
+                        LOGGER.log(SEVERE, "could not get flow-execution for build " + build.getFullDisplayName());
                     }
-                },
-                Executors.newSingleThreadExecutor());
+                }
+            },
+            Executors.newSingleThreadExecutor()
+        );
     }
 
     public void publishResult(Run<?, ?> build, GitLabSCMHeadMetadataAction metadata) {
@@ -142,7 +143,7 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
 
             } else if (isStageEndNode(node, getRunningContexts().peekNodeId())) {
 
-                // If this or a prior stage failed then build.result is set to 'FAILED'
+                 // If this or a prior stage failed then build.result is set to 'FAILED'
                 // otherwise build.result is still null and we assume success.
                 BuildState state = success;
                 if(build.getResult() != null) {
@@ -196,7 +197,6 @@ public final class GitLabSCMPublishAction extends InvisibleAction implements Ser
             String context = "#" + (++stageCount) + " " + name;
             contexts.put(id, context);
             return context;
-
         }
 
         String peekNodeId() {

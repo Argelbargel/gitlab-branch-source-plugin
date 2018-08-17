@@ -27,7 +27,7 @@ public final class GitLabSCMAcceptMergeRequestAction extends InvisibleAction imp
 
     public GitLabSCMAcceptMergeRequestAction(GitLabMergeRequest MR, int mergeRequestScopedId, String commitMessage, boolean removeSourceBranch) {
         this.mergeRequestPID = MR.getProjectId();
-        this.mergeRequestID = MR.getId();
+        this.mergeRequestID = MR.getIid();
         this.mergeRequestScopedId = mergeRequestScopedId;
         this.commitMessage = commitMessage;
         this.removeSourceBranch = removeSourceBranch;
