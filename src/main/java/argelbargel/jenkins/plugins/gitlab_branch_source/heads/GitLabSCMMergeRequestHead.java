@@ -32,24 +32,30 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.heads.GitLabSCMRe
 public final class GitLabSCMMergeRequestHead extends GitLabSCMHeadImpl implements ChangeRequestSCMHead {
     private final int id;
     private final String title;
+    private final String description;
     private final GitLabSCMHead sourceBranch;
     private final GitLabSCMBranchHead targetBranch;
     private final boolean mergeable;
     private final boolean merge;
 
 
-    GitLabSCMMergeRequestHead(int id, String title, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
-        this(id, title, source, target, mergeable, false);
+    GitLabSCMMergeRequestHead(int id, String title, String description, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable) {
+        this(id, title, description, source, target, mergeable, false);
     }
 
-    private GitLabSCMMergeRequestHead(int id, String title, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable, boolean merge) {
-        super(source.getProjectId(), title + (merge ? " (merge)" : ""), source.getRevision().getHash(), Messages.GitLabSCMMergeRequest_Pronoun(), MERGE_REQUESTS);
+    private GitLabSCMMergeRequestHead(int id, String title, String description, GitLabSCMHead source, GitLabSCMBranchHead target, boolean mergeable, boolean merge) {
+        super(source.getProjectId(), title + (merge ? "(merge)" : ""), source.getRevision().getHash(), Messages.GitLabSCMMergeRequest_Pronoun(), MERGE_REQUESTS);
         this.id = id;
         this.title = title;
+        this.description = description;
         this.sourceBranch = source;
         this.targetBranch = target;
         this.mergeable = mergeable;
         this.merge = merge;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Nonnull
@@ -65,7 +71,7 @@ public final class GitLabSCMMergeRequestHead extends GitLabSCMHeadImpl implement
     }
 
     public GitLabSCMMergeRequestHead merged() {
-        return new GitLabSCMMergeRequestHead(id, title, sourceBranch, targetBranch, mergeable, true);
+        return new GitLabSCMMergeRequestHead(id, title, description, sourceBranch, targetBranch, mergeable, true);
     }
 
     public GitLabSCMHead getSource() {
