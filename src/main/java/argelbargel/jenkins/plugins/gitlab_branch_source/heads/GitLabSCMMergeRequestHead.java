@@ -65,6 +65,11 @@ public final class GitLabSCMMergeRequestHead extends GitLabSCMHeadImpl implement
     }
 
     @Nonnull
+    public String getTitle() {
+        return String.valueOf(title);
+    }
+
+    @Nonnull
     @Override
     public GitLabSCMHead getTarget() {
         return targetBranch;

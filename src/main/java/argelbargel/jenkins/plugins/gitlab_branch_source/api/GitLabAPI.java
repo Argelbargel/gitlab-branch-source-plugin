@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectSelector.VISIBLE;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectVisibility.ALL;
+import org.gitlab.api.http.Method;
 
 
 public final class GitLabAPI {
@@ -32,6 +33,7 @@ public final class GitLabAPI {
 
     public static GitLabAPI connect(String url, String token, boolean ignoreCertificateErrors, int requestTimeout) throws GitLabAPIException {
         try {
+            apiToken = token;
             GitlabAPI delegate = GitlabAPI.connect(url, token);
             delegate.ignoreCertificateErrors(ignoreCertificateErrors);
             return new GitLabAPI(delegate);
@@ -43,6 +45,7 @@ public final class GitLabAPI {
     private static final Logger LOGGER = Logger.getLogger(GitLabAPI.class.getName());
 
     private final GitlabAPI delegate;
+    private static String apiToken;
 
     private GitLabAPI(GitlabAPI delegate) {
         this.delegate = delegate;
@@ -106,7 +109,7 @@ public final class GitLabAPI {
     private List<GitlabTag> getTags(Serializable nameOrId) throws GitLabAPIException {
         try {
             return delegate.getTags(nameOrId);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
     }
@@ -258,7 +261,7 @@ public final class GitLabAPI {
             }
         }
 
-        return delegate.addProjectHook(projectId, url, true, false, true, true, false);
+        return delegate.addProjectHook(projectId, url, true, false, true, true, false, false, apiToken);
     }
 
     public boolean unregisterProjectHook(URL url, int projectId) throws GitLabAPIException {
@@ -275,7 +278,7 @@ public final class GitLabAPI {
             if (hook.getUrl().equals(url)) {
                 LOGGER.fine("un-registering project-hook for project " + projectId + ": " + url + "...");
                 String tailUrl = GitlabProject.URL + PATH_SEP + hook.getProjectId() + GitlabProjectHook.URL + PATH_SEP + hook.getId();
-                delegate.retrieve().method("DELETE").to(tailUrl, GitlabProjectHook[].class);
+                delegate.retrieve().method(Method.DELETE).to(tailUrl, GitlabProjectHook[].class);
                 return true;
             }
         }
