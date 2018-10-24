@@ -47,6 +47,7 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
     private String checkoutCredentialsId;
     private boolean updateBuildDescription;
     private boolean publishUnstableBuildsAsSuccess;
+    private boolean excludeArchivedProjects;
     private String mergeCommitMessage;
 
 
@@ -73,6 +74,7 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         this.checkoutCredentialsId = CHECKOUT_CREDENTIALS_ANONYMOUS;
         this.updateBuildDescription = true;
         this.publishUnstableBuildsAsSuccess = false;
+        this.excludeArchivedProjects = true;
         this.mergeCommitMessage = DEFAULT_MERGE_COMMIT_MESSAGE;
     }
 
@@ -106,7 +108,6 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
         this.checkoutCredentialsId = checkoutCredentialsId;
     }
 
-
     @DataBoundSetter
     public void setUpdateBuildDescription(boolean value) {
         updateBuildDescription = value;
@@ -114,6 +115,15 @@ public final class GitLabSCMSourceSettings extends AbstractDescribableImpl<GitLa
 
     public boolean getUpdateBuildDescription() {
         return updateBuildDescription;
+    }
+    
+    @DataBoundSetter
+    public void setExcludeArchivedProjects(boolean value) {
+        excludeArchivedProjects = value;
+    }
+    
+    public boolean getExcludeArchivedProjects(){
+        return excludeArchivedProjects;
     }
 
     @DataBoundSetter

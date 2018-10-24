@@ -150,15 +150,15 @@ public final class GitLabAPI {
         }
     }
 
-    public List<GitLabProject> findProjects(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
-        LOGGER.fine("finding projects for group" + group + ", " + selector + ", " + visibility + ", " + searchPattern + "...");
-        return findProjects(projectUrl(group, selector, visibility, searchPattern));
+    public List<GitLabProject> findProjects(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, Boolean excludeArchivedProjects) throws GitLabAPIException {
+        LOGGER.fine("finding projects for group" + group + ", " + selector + ", " + visibility + ", " + searchPattern + ", " + excludeArchivedProjects + "...");
+        return findProjects(projectUrl(group, selector, visibility, searchPattern, excludeArchivedProjects));
     }
 
 
-    public List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
-        LOGGER.fine("finding projects for " + selector + ", " + visibility + ", " + searchPattern + "...");
-        return findProjects(projectUrl(selector, visibility, searchPattern));
+    public List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, Boolean excludeArchivedProjects) throws GitLabAPIException {
+        LOGGER.fine("finding projects for " + selector + ", " + visibility + ", " + searchPattern + ", " + excludeArchivedProjects + "...");
+        return findProjects(projectUrl(selector, visibility, searchPattern, excludeArchivedProjects));
     }
 
     private List<GitLabProject> findProjects(String url) throws GitLabAPIException {
@@ -285,7 +285,7 @@ public final class GitLabAPI {
         return false;
     }
 
-    private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
+    private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, boolean excludeArchivedProjects) {
         StringBuilder urlBuilder = new StringBuilder(GitlabGroup.URL).append(PATH_SEP).append(group).append(GitLabProject.URL).append("?membership=true");
         if (!VISIBLE.equals(selector)) {
             urlBuilder.append("&").append(selector.id()).append("=true");
@@ -293,14 +293,19 @@ public final class GitLabAPI {
         if (!ALL.equals(visibility)) {
             urlBuilder.append("&visibility=").append(visibility.id());
         }
+        if (excludeArchivedProjects) {
+            urlBuilder.append("&archived=").append("false");
+        }
         if (!StringUtils.isEmpty(searchPattern)) {
             urlBuilder.append("&search=").append(searchPattern);
         }
+        
+        LOGGER.warning("Searching for projects: " + urlBuilder.toString());
         return urlBuilder.toString();
     }
 
 
-    private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
+    private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, boolean excludeArchivedProjects) {
         StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL).append("?membership=true");
         if (!VISIBLE.equals(selector)) {
             urlBuilder.append("&").append(selector.id()).append("=true");
@@ -308,9 +313,13 @@ public final class GitLabAPI {
         if (!ALL.equals(visibility)) {
             urlBuilder.append("&visibility=").append(visibility.id());
         }
+        if (excludeArchivedProjects) {
+            urlBuilder.append("&archived=").append("false");
+        }
         if (!StringUtils.isEmpty(searchPattern)) {
             urlBuilder.append("&search=").append(searchPattern);
         }
+        LOGGER.warning("Searching for projects: " + urlBuilder.toString());
         return urlBuilder.toString();
     }
 

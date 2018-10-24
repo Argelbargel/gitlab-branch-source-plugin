@@ -17,24 +17,26 @@ import static argelbargel.jenkins.plugins.gitlab_branch_source.GitLabHelper.gitL
 abstract class ProjectQuery {
     public static ProjectQuery create(GitLabSCMNavigator navigator) {
         if (!StringUtils.isEmpty(navigator.getProjectGroup())) {
-            return new GroupProjectQuery(navigator.getProjectGroup(), navigator.getProjectSelectorId(), navigator.getProjectVisibilityId(), navigator.getProjectSearchPattern());
+            return new GroupProjectQuery(navigator.getProjectGroup(), navigator.getProjectSelectorId(), navigator.getProjectVisibilityId(), navigator.getProjectSearchPattern(), navigator.getSourceSettings().getExcludeArchivedProjects());
         } else {
-            return new DefaultProjectQuery(navigator.getProjectSelectorId(), navigator.getProjectVisibilityId(), navigator.getProjectSearchPattern());
+            return new DefaultProjectQuery(navigator.getProjectSelectorId(), navigator.getProjectVisibilityId(), navigator.getProjectSearchPattern(), navigator.getSourceSettings().getExcludeArchivedProjects());
         }
     }
 
     private GitLabProjectSelector selector;
     private GitLabProjectVisibility visibility;
     private String searchPattern;
+    private Boolean excludeArchivedProjects;
 
-    ProjectQuery(String selector, String visibility, String searchPattern) {
-        this(GitLabProjectSelector.byId(selector), GitLabProjectVisibility.byId(visibility), searchPattern);
+    ProjectQuery(String selector, String visibility, String searchPattern, Boolean excludeArchivedProjects) {
+        this(GitLabProjectSelector.byId(selector), GitLabProjectVisibility.byId(visibility), searchPattern, excludeArchivedProjects);
     }
 
-    private ProjectQuery(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
+    private ProjectQuery(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, Boolean excludeArchivedProjects) {
         this.selector = selector;
         this.visibility = visibility;
         this.searchPattern = searchPattern;
+        this.excludeArchivedProjects = excludeArchivedProjects;
     }
 
     @Nonnull
@@ -50,6 +52,10 @@ abstract class ProjectQuery {
     @Nonnull
     final String getSearchPattern() {
         return searchPattern;
+    }
+    
+    final Boolean getExcludeArchivedProjects() {
+        return excludeArchivedProjects;
     }
 
     final List<GitLabProject> execute(String connectionName) throws GitLabAPIException {

@@ -9,12 +9,12 @@ import java.util.List;
 
 
 class DefaultProjectQuery extends ProjectQuery {
-    DefaultProjectQuery(String selector, String visibility, String searchPattern) {
-        super(selector, visibility, searchPattern);
+    DefaultProjectQuery(String selector, String visibility, String searchPattern, Boolean excludeArchivedProjects) {
+        super(selector, visibility, searchPattern, excludeArchivedProjects);
     }
 
     @Override
     protected List<GitLabProject> execute(GitLabAPI api) throws GitLabAPIException {
-        return api.findProjects(getSelector(), getVisibility(), getSearchPattern());
+        return api.findProjects(getSelector(), getVisibility(), getSearchPattern(), getExcludeArchivedProjects());
     }
 }

@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>2.20</version>
+		<version>3.25</version>
 		<relativePath />
 	</parent>
 
 	<properties>
-		<jenkins.version>2.7.1</jenkins.version>
+		<jenkins.version>2.138.2</jenkins.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<java.level>8</java.level>
@@ -267,9 +267,9 @@
 			<plugin>
 				<groupId>org.jenkins-ci.tools</groupId>
 				<artifactId>maven-hpi-plugin</artifactId>
-				<version>1.121</version>
+				<version>2.6</version>
 				<configuration>
-					<compatibleSinceVersion>2.7.1</compatibleSinceVersion>
+					<compatibleSinceVersion>2.138.2</compatibleSinceVersion>
 				</configuration>
 			</plugin>
 		</plugins>
