@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectSelector.VISIBLE;
 import static argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabProjectVisibility.ALL;
-import org.gitlab.api.http.Method;
 
 
 public final class GitLabAPI {
@@ -261,7 +260,7 @@ public final class GitLabAPI {
             }
         }
 
-        return delegate.addProjectHook(projectId, url, true, false, true, true, false, false, apiToken);
+        return delegate.addProjectHook(projectId, url, true, false, true, true, false);
     }
 
     public boolean unregisterProjectHook(URL url, int projectId) throws GitLabAPIException {
@@ -278,7 +277,7 @@ public final class GitLabAPI {
             if (hook.getUrl().equals(url)) {
                 LOGGER.fine("un-registering project-hook for project " + projectId + ": " + url + "...");
                 String tailUrl = GitlabProject.URL + PATH_SEP + hook.getProjectId() + GitlabProjectHook.URL + PATH_SEP + hook.getId();
-                delegate.retrieve().method(Method.DELETE).to(tailUrl, GitlabProjectHook[].class);
+                delegate.retrieve().method("DELETE").to(tailUrl, GitlabProjectHook[].class);
                 return true;
             }
         }
