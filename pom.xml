@@ -211,11 +211,19 @@
 			<id>repo.jenkins-ci.org</id>
 			<url>https://repo.jenkins-ci.org/public/</url>
 		</repository>
+		<repository>
+			<id>1_jenkins-releases</id>
+			<url>http://repo.jenkins-ci.org/releases/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>repo.jenkins-ci.org</id>
 			<url>https://repo.jenkins-ci.org/public/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>1_jenkins-releases</id>
+			<url>http://repo.jenkins-ci.org/releases/</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>svg-rasterizer-maven-plugin-mvn-repo</id>
