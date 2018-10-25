@@ -11,13 +11,13 @@ import java.util.List;
 public class GroupProjectQuery extends ProjectQuery {
     private final String group;
 
-    GroupProjectQuery(String group, String selector, String visibility, String searchPattern) {
-        super(selector, visibility, searchPattern);
+    GroupProjectQuery(String group, String selector, String visibility, String searchPattern, Boolean excludeArchivedProjects) {
+        super(selector, visibility, searchPattern, excludeArchivedProjects);
         this.group = group;
     }
 
     @Override
     protected List<GitLabProject> execute(GitLabAPI api) throws GitLabAPIException {
-        return api.findProjects(group, getSelector(), getVisibility(), getSearchPattern());
+        return api.findProjects(group, getSelector(), getVisibility(), getSearchPattern(), getExcludeArchivedProjects());
     }
 }

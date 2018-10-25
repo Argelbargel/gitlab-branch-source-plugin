@@ -25,7 +25,7 @@ public class GitLabMergeRequest extends GitlabMergeRequest {
         this.wip = wip;
     }
 
-    public boolean isWorkInProgress() {
+    public Boolean isWorkInProgress() {
         return wip;
     }
 

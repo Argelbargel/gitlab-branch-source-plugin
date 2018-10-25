@@ -32,6 +32,7 @@ public final class GitLabAPI {
 
     public static GitLabAPI connect(String url, String token, boolean ignoreCertificateErrors, int requestTimeout) throws GitLabAPIException {
         try {
+            apiToken = token;
             GitlabAPI delegate = GitlabAPI.connect(url, token);
             delegate.ignoreCertificateErrors(ignoreCertificateErrors);
             return new GitLabAPI(delegate);
@@ -43,6 +44,7 @@ public final class GitLabAPI {
     private static final Logger LOGGER = Logger.getLogger(GitLabAPI.class.getName());
 
     private final GitlabAPI delegate;
+    private static String apiToken;
 
     private GitLabAPI(GitlabAPI delegate) {
         this.delegate = delegate;
@@ -106,7 +108,7 @@ public final class GitLabAPI {
     private List<GitlabTag> getTags(Serializable nameOrId) throws GitLabAPIException {
         try {
             return delegate.getTags(nameOrId);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new GitLabAPIException(e);
         }
     }
@@ -147,15 +149,15 @@ public final class GitLabAPI {
         }
     }
 
-    public List<GitLabProject> findProjects(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
-        LOGGER.fine("finding projects for group" + group + ", " + selector + ", " + visibility + ", " + searchPattern + "...");
-        return findProjects(projectUrl(group, selector, visibility, searchPattern));
+    public List<GitLabProject> findProjects(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, Boolean excludeArchivedProjects) throws GitLabAPIException {
+        LOGGER.fine("finding projects for group" + group + ", " + selector + ", " + visibility + ", " + searchPattern + ", " + excludeArchivedProjects + "...");
+        return findProjects(projectUrl(group, selector, visibility, searchPattern, excludeArchivedProjects));
     }
 
 
-    public List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) throws GitLabAPIException {
-        LOGGER.fine("finding projects for " + selector + ", " + visibility + ", " + searchPattern + "...");
-        return findProjects(projectUrl(selector, visibility, searchPattern));
+    public List<GitLabProject> findProjects(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, Boolean excludeArchivedProjects) throws GitLabAPIException {
+        LOGGER.fine("finding projects for " + selector + ", " + visibility + ", " + searchPattern + ", " + excludeArchivedProjects + "...");
+        return findProjects(projectUrl(selector, visibility, searchPattern, excludeArchivedProjects));
     }
 
     private List<GitLabProject> findProjects(String url) throws GitLabAPIException {
@@ -188,10 +190,11 @@ public final class GitLabAPI {
         try {
             Query query = new Query()
                     .appendIf("path", path)
-                    .appendIf("ref_name", ref);
+                    .appendIf("ref", ref);
 
-
+            query.append("per_page","10000");
             String tailUrl = GitlabProject.URL + "/" + id + "/repository" + GitlabRepositoryTree.URL + query.toString();
+            LOGGER.fine("tailurl: " + tailUrl);
             GitlabRepositoryTree[] tree = delegate.retrieve().to(tailUrl, GitlabRepositoryTree[].class);
             return Arrays.asList(tree);
         } catch (Exception e) {
@@ -278,41 +281,44 @@ public final class GitLabAPI {
                 return true;
             }
         }
-
         return false;
     }
 
-    private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
+    private String projectUrl(String group, GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, boolean excludeArchivedProjects) {
         StringBuilder urlBuilder = new StringBuilder(GitlabGroup.URL).append(PATH_SEP).append(group).append(GitLabProject.URL).append("?membership=true");
-
         if (!VISIBLE.equals(selector)) {
             urlBuilder.append("&").append(selector.id()).append("=true");
         }
-
         if (!ALL.equals(visibility)) {
-            urlBuilder.append("&").append("visibility=").append(visibility.id());
+            urlBuilder.append("&visibility=").append(visibility.id());
         }
-
+        if (excludeArchivedProjects) {
+            urlBuilder.append("&archived=").append("false");
+        }
         if (!StringUtils.isEmpty(searchPattern)) {
-            urlBuilder.append("&").append("search=").append(searchPattern);
+            urlBuilder.append("&search=").append(searchPattern);
         }
-
+        
+        LOGGER.warning("Searching for projects: " + urlBuilder.toString());
         return urlBuilder.toString();
     }
 
 
-    private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern) {
-        StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL)
-                .append(PATH_SEP).append(selector.id()).append("?membership=true");
-
+    private String projectUrl(GitLabProjectSelector selector, GitLabProjectVisibility visibility, String searchPattern, boolean excludeArchivedProjects) {
+        StringBuilder urlBuilder = new StringBuilder(GitlabProject.URL).append("?membership=true");
+        if (!VISIBLE.equals(selector)) {
+            urlBuilder.append("&").append(selector.id()).append("=true");
+        }
         if (!ALL.equals(visibility)) {
             urlBuilder.append("&visibility=").append(visibility.id());
         }
-
-        if (!StringUtils.isEmpty(searchPattern)) {
-            urlBuilder.append("&").append("search=").append(searchPattern);
+        if (excludeArchivedProjects) {
+            urlBuilder.append("&archived=").append("false");
         }
-
+        if (!StringUtils.isEmpty(searchPattern)) {
+            urlBuilder.append("&search=").append(searchPattern);
+        }
+        LOGGER.warning("Searching for projects: " + urlBuilder.toString());
         return urlBuilder.toString();
     }
 
@@ -323,4 +329,5 @@ public final class GitLabAPI {
             throw new GitLabAPIException(e);
         }
     }
+
 }

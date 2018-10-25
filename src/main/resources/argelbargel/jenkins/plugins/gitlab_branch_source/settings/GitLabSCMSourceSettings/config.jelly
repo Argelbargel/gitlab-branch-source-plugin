@@ -48,6 +48,9 @@
                     <f:entry title="${%Publish unstable builds as success}" field="publishUnstableBuildsAsSuccess">
                         <f:checkbox default="${descriptor.defaults.publishUnstableBuildAsSuccess}"/>
                     </f:entry>
+                    <f:entry title="${%Exclude archived projects}" field="excludeArchivedProjects">
+                        <f:checkbox default="${descriptor.defaults.excludeArchivedProjects}"/>
+                    </f:entry>
                 </table>
             </f:block>
         </f:section>

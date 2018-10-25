@@ -1,10 +1,7 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.events;
 
 import com.dabsquared.gitlabjenkins.cause.CauseData;
-import com.dabsquared.gitlabjenkins.gitlab.hook.model.Commit;
-import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestHook;
-import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestObjectAttributes;
-import com.dabsquared.gitlabjenkins.gitlab.hook.model.PushHook;
+import com.dabsquared.gitlabjenkins.gitlab.hook.model.*;
 import org.eclipse.jgit.util.StringUtils;
 
 import java.util.List;

@@ -10,6 +10,7 @@ import jenkins.branch.BranchSource;
 import jenkins.scm.api.SCMHead;
 import jenkins.scm.api.SCMSource;
 import jenkins.scm.api.SCMSourceDescriptor;
+import jenkins.scm.api.SCMRevision;
 import jenkins.scm.api.mixin.TagSCMHead;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
@@ -26,7 +27,6 @@ public class GitLabSCMBranchBuildStrategy extends BranchBuildStrategy {
         if (source instanceof GitLabSCMSource) {
             return isAutomaticBuild((GitLabSCMSource) source, head);
         }
-
         return !TagSCMHead.class.isInstance(head);
     }
 
@@ -45,6 +45,14 @@ public class GitLabSCMBranchBuildStrategy extends BranchBuildStrategy {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean isAutomaticBuild(SCMSource source, SCMHead head, SCMRevision var3,  SCMRevision var4) {
+        if (source instanceof GitLabSCMSource) {
+            return isAutomaticBuild((GitLabSCMSource) source, head);
+        }
+        return !TagSCMHead.class.isInstance(head);
     }
 
     private boolean isAutomaticBuild(GitLabSCMSource source, GitLabSCMMergeRequestHead head) {
@@ -66,7 +74,7 @@ public class GitLabSCMBranchBuildStrategy extends BranchBuildStrategy {
 
     private GitLabSCMBranchBuildStrategy() { /* singleton */ }
 
-    
+
     @Extension
     public static class DescriptorImpl extends BranchBuildStrategyDescriptor {
         @Nonnull
