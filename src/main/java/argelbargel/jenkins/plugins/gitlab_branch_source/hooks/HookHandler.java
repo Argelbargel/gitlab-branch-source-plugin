@@ -1,12 +1,8 @@
 package argelbargel.jenkins.plugins.gitlab_branch_source.hooks;
 
-
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.GitLabHookEventType;
 import argelbargel.jenkins.plugins.gitlab_branch_source.api.SystemHook;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMMergeRequestEvent;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMPushEvent;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMSourceEvent;
-import argelbargel.jenkins.plugins.gitlab_branch_source.events.GitLabSCMTagPushEvent;
+import argelbargel.jenkins.plugins.gitlab_branch_source.events.*;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.MergeRequestHook;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.PushHook;
 import com.dabsquared.gitlabjenkins.gitlab.hook.model.WebHook;
@@ -37,9 +33,7 @@ class HookHandler {
 
     private void handle(String id, GitLabHookEventType eventType, HttpServletRequest request) throws IOException {
         LOGGER.fine("handling hook for " + id + " for eventType " + eventType);
-        try
-        {
-
+        try {
             String requestBody = getRequestBody(request);
             switch (eventType) {
                 case PUSH:
@@ -60,7 +54,7 @@ class HookHandler {
                     throw new IllegalArgumentException("cannot handle hook-event of type " + eventType);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "GitLabHookEventType", e); 
+            LOGGER.log(Level.WARNING, "GitLabHookEventType", e);
         }
     }
 

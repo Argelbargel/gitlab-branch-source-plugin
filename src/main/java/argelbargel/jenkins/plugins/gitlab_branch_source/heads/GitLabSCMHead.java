@@ -14,11 +14,11 @@ public abstract class GitLabSCMHead extends SCMHead implements SCMHeadMixin {
     public static final String REVISION_HEAD = "HEAD";
 
     public static GitLabSCMBranchHead createBranch(int projectId, String name, String hash) {
-        return createBranch(projectId, name+"t2", hash, false);
+        return createBranch(projectId, name, hash, false);
     }
 
     public static GitLabSCMTagHead createTag(int projectId, String name, String hash, long timestamp) {
-        return new GitLabSCMTagHead(projectId, name+"t3", hash, timestamp);
+        return new GitLabSCMTagHead(projectId, name, hash, timestamp);
     }
 
     public static GitLabSCMMergeRequestHead createMergeRequest(int id, String name, int iid, GitLabSCMHead source, GitLabSCMBranchHead target) {
