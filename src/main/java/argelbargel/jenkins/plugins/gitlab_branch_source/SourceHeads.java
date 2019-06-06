@@ -146,15 +146,13 @@ class SourceHeads {
     }
 
     private void retrieveTag(SCMSourceCriteria criteria, @Nonnull SCMHeadObserver observer, String tagName, @Nonnull TaskListener listener) throws IOException, InterruptedException {
-        if (!source.isExcluded(tagName)) {
-            log(listener, Messages.GitLabSCMSource_retrievingTag(tagName));
-            try {
-                GitlabTag tag = api().getTag(source.getProjectId(), tagName);
-                tag.getCommit().getCommittedDate().getTime();
-                observe(criteria, observer, tag, listener);
-            } catch (NoSuchElementException e) {
-                log(listener, Messages.GitLabSCMSource_removedHead(tagName));
-            }
+        log(listener, Messages.GitLabSCMSource_retrievingTag(tagName));
+        try {
+            GitlabTag tag = api().getTag(source.getProjectId(), tagName);
+            tag.getCommit().getCommittedDate().getTime();
+            observe(criteria, observer, tag, listener);
+        } catch (NoSuchElementException e) {
+            log(listener, Messages.GitLabSCMSource_removedHead(tagName));
         }
     }
 
@@ -202,9 +200,7 @@ class SourceHeads {
             for (GitlabTag tag : api().getTags(source.getProjectId())) {
                 checkInterrupt();
 
-                if (!source.isExcluded(tag.getName())) {
-                    observe(criteria, observer, tag, listener);
-                }
+                observe(criteria, observer, tag, listener);
             }
         }
     }
