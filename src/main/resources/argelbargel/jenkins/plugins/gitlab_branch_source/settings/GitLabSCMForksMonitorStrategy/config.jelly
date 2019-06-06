@@ -4,8 +4,7 @@
     <f:optionalBlock title="Monitor &amp; Build Merge Requests from Forks" field="monitored" inline="true">
         <f:nested>
             <table>
-                <f:optionalBlock title="${%Build merged with base branch}" field="build"
-                                 checked="${descriptor.defaults.build}" inline="true">
+                <f:optionalBlock title="${%Build merged with base branch}" field="build" inline="true">
                     <f:entry title="${%Build only mergeable requests}" field="buildOnlyMergeableMerged">
                         <f:checkbox default="${descriptor.defaults.buildOnlyMergeableMerged}"/>
                     </f:entry>
