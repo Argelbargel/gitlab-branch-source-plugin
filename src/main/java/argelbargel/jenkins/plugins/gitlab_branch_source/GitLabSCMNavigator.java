@@ -109,6 +109,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
         return hookListener.getListen();
     }
 
+    @DataBoundSetter
     public void setListenToWebHooks(boolean value) {
         hookListener.setListen(value);
     }
@@ -117,6 +118,7 @@ public class GitLabSCMNavigator extends SCMNavigator {
         return hookListener.getRegister();
     }
 
+    @DataBoundSetter
     public void setRegisterWebHooks(boolean value) {
         hookListener.setRegister(value);
     }
