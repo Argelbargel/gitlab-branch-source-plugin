@@ -1,3 +1,7 @@
+# THIS PLUGIN IS DEPRECATED
+Please use the "offical" (and properly released/supported) Gitlab-Branch-Source-Plugin at https://jenkins.io/blog/2019/08/23/introducing-gitlab-branch-source-plugin/
+
+
 # Multibranch projects and organization folders from GitLab [![Build Status](https://travis-ci.org/Argelbargel/gitlab-branch-source-plugin.svg?branch=master)](https://travis-ci.org/Argelbargel/gitlab-branch-source-plugin)
 
 ## Introduction
